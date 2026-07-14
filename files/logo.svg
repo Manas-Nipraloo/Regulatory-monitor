@@ -1,0 +1,59 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1D2338"/>
+      <stop offset="1" stop-color="#121625"/>
+    </linearGradient>
+    <linearGradient id="brassGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E0B563"/>
+      <stop offset="0.55" stop-color="#B8842E"/>
+      <stop offset="1" stop-color="#8F6620"/>
+    </linearGradient>
+    <linearGradient id="brassRing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0CE8C"/>
+      <stop offset="1" stop-color="#B8842E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="128" height="128" rx="26" fill="url(#bgGrad)"/>
+
+  <!-- seal ring: notched coin/wax-seal edge -->
+  <g transform="translate(64,60)">
+    <circle r="38" fill="none" stroke="url(#brassRing)" stroke-width="2.5" opacity="0.55"/>
+    <!-- notch ticks around the ring -->
+    <g stroke="url(#brassRing)" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(0)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(30)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(60)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(90)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(120)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(150)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(180)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(210)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(240)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(270)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(300)"/>
+      <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(330)"/>
+    </g>
+
+    <!-- inner seal disc -->
+    <circle r="29" fill="url(#brassGrad)"/>
+
+    <!-- document glyph, cut from the disc -->
+    <g>
+      <rect x="-14" y="-19" width="28" height="34" rx="3" fill="#1B1204" opacity="0.92"/>
+      <rect x="-9" y="-11" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+      <rect x="-9" y="-4" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+      <rect x="-9" y="3" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+      <rect x="-9" y="10" width="11" height="3" rx="1.5" fill="url(#brassGrad)"/>
+    </g>
+  </g>
+
+  <!-- verified / checked badge -->
+  <g transform="translate(93,90)">
+    <circle r="15.5" fill="#121625"/>
+    <circle r="15.5" fill="none" stroke="url(#brassRing)" stroke-width="2"/>
+    <path d="M-6.5 0.5 L-2 5 L7 -5.5" fill="none" stroke="url(#brassRing)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

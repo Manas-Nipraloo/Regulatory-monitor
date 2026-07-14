@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Article History - Regulatory Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,600;6..72,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/history.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="seal-mark">
+        <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#1D2338"/>
+              <stop offset="1" stop-color="#121625"/>
+            </linearGradient>
+            <linearGradient id="brassGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#E0B563"/>
+              <stop offset="0.55" stop-color="#B8842E"/>
+              <stop offset="1" stop-color="#8F6620"/>
+            </linearGradient>
+            <linearGradient id="brassRing" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#F0CE8C"/>
+              <stop offset="1" stop-color="#B8842E"/>
+            </linearGradient>
+          </defs>
+          <rect width="128" height="128" rx="26" fill="url(#bgGrad)"/>
+          <g transform="translate(64,60)">
+            <circle r="38" fill="none" stroke="url(#brassRing)" stroke-width="2.5" opacity="0.55"/>
+            <g stroke="url(#brassRing)" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(0)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(30)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(60)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(90)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(120)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(150)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(180)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(210)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(240)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(270)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(300)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(330)"/>
+            </g>
+            <circle r="29" fill="url(#brassGrad)"/>
+            <g>
+              <rect x="-14" y="-19" width="28" height="34" rx="3" fill="#1B1204" opacity="0.92"/>
+              <rect x="-9" y="-11" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+              <rect x="-9" y="-4" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+              <rect x="-9" y="3" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+              <rect x="-9" y="10" width="11" height="3" rx="1.5" fill="url(#brassGrad)"/>
+            </g>
+          </g>
+          <g transform="translate(93,90)">
+            <circle r="15.5" fill="#121625"/>
+            <circle r="15.5" fill="none" stroke="url(#brassRing)" stroke-width="2"/>
+            <path d="M-6.5 0.5 L-2 5 L7 -5.5" fill="none" stroke="url(#brassRing)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Regulatory Monitor</h1>
+        <p>Article history</p>
+      </div>
+    </div>
+
+    <p class="side-section-label">History filters</p>
+    <div class="field">
+      <label for="dpTrigger">Run date</label>
+      <input type="date" id="historyDate" hidden>
+      <div class="datepick" id="datePick">
+        <button type="button" class="dp-trigger" id="dpTrigger" aria-haspopup="dialog" aria-expanded="false">
+          <svg class="dp-cal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+          <span id="dpLabel">Any date</span>
+          <svg class="dp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="dp-pop" id="dpPop" role="dialog" aria-label="Choose date" hidden>
+          <div class="dp-head">
+            <button type="button" class="dp-nav" id="dpPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+            <span class="dp-title" id="dpTitle"></span>
+            <button type="button" class="dp-nav" id="dpNext" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+          </div>
+          <div class="dp-dow" id="dpDow"></div>
+          <div class="dp-days" id="dpDays"></div>
+          <div class="dp-foot">
+            <button type="button" class="dp-link" id="dpClear">Clear</button>
+            <button type="button" class="dp-link dp-link-accent" id="dpToday">Today</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label for="searchText">Search article</label>
+      <input type="search" id="searchText" placeholder="Title or summary">
+    </div>
+    <div class="field">
+      <label for="statusFilter">Status</label>
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option value="success">Success</option>
+        <option value="issues">Issues</option>
+        <option value="empty">Empty</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="driveFilter">Drive</label>
+      <select id="driveFilter">
+        <option value="">All Drive states</option>
+        <option value="linked">Has Drive link</option>
+        <option value="missing">No Drive link</option>
+      </select>
+    </div>
+
+    <div class="source-group">
+      <p class="source-group-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+        FEMA / RBI
+      </p>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f1" value="FEMA Notifications" checked><label for="f1">FEMA Notifications</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f2" value="FEMA Master Directions" checked><label for="f2">FEMA Master Directions</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f3" value="FEMA Master Circulars" checked><label for="f3">FEMA Master Circulars</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f4" value="FEMA Press Release" checked><label for="f4">FEMA Press Release</label></div>
+    </div>
+
+    <div class="source-group">
+      <p class="source-group-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+        MCA
+      </p>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f5" value="MCA Latest News and Important Updates Link" checked><label for="f5">Latest News &amp; Updates</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f6" value="MCA Whats New Tab Link" checked><label for="f6">What's New Tab</label></div>
+    </div>
+
+    <div class="source-group">
+      <p class="source-group-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 7l7-4 7 4M4 7h6l-3 7a3.2 3.2 0 0 0 6 0l-3-7M14 7h6l-3 7a3.2 3.2 0 0 0 6 0l-3-7"/></svg>
+        SEBI
+      </p>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f7" value="SEBI website (Regulations)" checked><label for="f7">Regulations</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f8" value="SEBI website (Rules)" checked><label for="f8">Rules</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f9" value="SEBI website (Master Circular)" checked><label for="f9">Master Circular</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f10" value="SEBI website (Guidelines)" checked><label for="f10">Guidelines</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f11" value="SEBI website (Gazette Notifications)" checked><label for="f11">Gazette Notifications</label></div>
+    </div>
+
+    <div class="source-group">
+      <p class="source-group-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Other
+      </p>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f12" value="NOC under Regulation 37 Updates" checked><label for="f12">NOC - Regulation 37</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f13" value="Website of ITAT Bar Mumbai" checked><label for="f13">ITAT Bar Mumbai</label></div>
+      <div class="source-row"><input class="source-filter" type="checkbox" id="f14" value="RFPs" checked><label for="f14">DIPAM RFPs</label></div>
+    </div>
+
+    <hr class="side-div">
+    <div class="side-actions">
+      <button class="btn btn-secondary" id="clearFilters" type="button">Clear Filters</button>
+      <button class="btn btn-primary" id="applyFilters" type="button">Apply Filters</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn sidebar-toggle" id="sidebarToggle" type="button" title="Toggle filters" aria-label="Toggle filters">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <h2>Article History</h2>
+          <div class="sub">Check what article was added on a selected date and where it came from.</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <a class="history-btn" href="/">Dashboard</a>
+        <div class="date-chip" id="dateChip">Recent history</div>
+        <button class="icon-btn" id="refreshHistory" type="button" title="Refresh">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="counters">
+      <div class="counter c-matched">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+        <div><div class="num" id="cArticles">0</div><div class="lbl">Articles</div></div>
+      </div>
+      <div class="counter c-drive">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 18a4 4 0 0 1-1-7.9 5 5 0 0 1 9.6-2A4.5 4.5 0 0 1 17 18H7z"/></svg></div>
+        <div><div class="num" id="cDrive">0</div><div class="lbl">Drive Linked</div></div>
+      </div>
+      <div class="counter c-draft">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 6l8 6 8-6"/></svg></div>
+        <div><div class="num" id="cDraft">0</div><div class="lbl">Draft Saved</div></div>
+      </div>
+      <div class="counter c-sent">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></div>
+        <div><div class="num" id="cRuns">0</div><div class="lbl">Runs</div></div>
+      </div>
+    </div>
+
+    <section class="panel history-panel">
+      <div class="results-head">
+        <h3><span class="pulse-dot"></span>History Records</h3>
+        <span class="run-tag" id="historyStatus">loading...</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Time</th><th>Source</th><th>Article</th><th>Published</th><th>Drive</th><th>Status</th><th>Summary / Message</th></tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="8" class="empty">Loading history...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="footer-note" id="footerNote">Showing recent history from saved local runs.</div>
+  </main>
+</div>
+
+<script>
+const historyBody = document.getElementById('historyBody');
+const historyDate = document.getElementById('historyDate');
+const searchText = document.getElementById('searchText');
+const statusFilter = document.getElementById('statusFilter');
+const driveFilter = document.getElementById('driveFilter');
+const refreshHistory = document.getElementById('refreshHistory');
+const applyFilters = document.getElementById('applyFilters');
+const clearFilters = document.getElementById('clearFilters');
+const dateChip = document.getElementById('dateChip');
+const historyStatus = document.getElementById('historyStatus');
+const footerNote = document.getElementById('footerNote');
+const cArticles = document.getElementById('cArticles');
+const cDrive = document.getElementById('cDrive');
+const cDraft = document.getElementById('cDraft');
+const cRuns = document.getElementById('cRuns');
+const shell = document.querySelector('.shell');
+const sidebarToggle = document.getElementById('sidebarToggle');
+let historyEntries = [];
+
+function escapeHtml(value){
+  return String(value ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+function displayDate(value){
+  if(!value) return '';
+  const [year,month,day] = value.split('-');
+  return `${day}-${month}-${year}`;
+}
+
+function statusClass(status){
+  return status === 'empty' ? 'status-empty' : (status || '');
+}
+
+function selectedSources(){
+  return Array.from(document.querySelectorAll('.source-filter:checked')).map(item => item.value);
+}
+
+function articleRows(entries){
+  const rows = [];
+  for(const entry of entries){
+    const createdAt = new Date(entry.created_at);
+    const articles = entry.articles && entry.articles.length ? entry.articles : [null];
+    for(const article of articles){
+      const source = article?.site_remark || (entry.sources && entry.sources.length ? entry.sources.join(', ') : 'All sources');
+      rows.push({
+        entry,
+        article,
+        source,
+        title: article?.title || `${entry.articles_found} article(s) in this run`,
+        published: article?.published_date || '',
+        summary: article?.summary || entry.message || '',
+        createdAt,
+        hasDrive: Boolean(article?.drive_pdf_url || article?.drive_folder_url),
+        driveUrl: article?.drive_pdf_url || article?.drive_folder_url || ''
+      });
+    }
+  }
+  return rows;
+}
+
+function filteredRows(){
+  const sourceSet = new Set(selectedSources());
+  const text = searchText.value.trim().toLowerCase();
+  const status = statusFilter.value;
+  const drive = driveFilter.value;
+  return articleRows(historyEntries).filter(row => {
+    const sourceOk = sourceSet.size === 0 || sourceSet.has(row.source);
+    const statusOk = !status || row.entry.status === status;
+    const driveOk = !drive || (drive === 'linked' ? row.hasDrive : !row.hasDrive);
+    const haystack = `${row.source} ${row.title} ${row.summary}`.toLowerCase();
+    const textOk = !text || haystack.includes(text);
+    return sourceOk && statusOk && driveOk && textOk;
+  });
+}
+
+function renderHistory(){
+  const rows = filteredRows();
+  const actualArticleCount = rows.filter(row => row.article).length;
+  const driveCount = rows.filter(row => row.hasDrive).length;
+  const draftCount = new Set(rows.filter(row => row.entry.webmail_draft_saved || row.entry.draft_path).map(row => row.entry.id)).size;
+  const runCount = new Set(rows.map(row => row.entry.id)).size;
+  cArticles.textContent = String(actualArticleCount);
+  cDrive.textContent = String(driveCount);
+  cDraft.textContent = String(draftCount);
+  cRuns.textContent = String(runCount);
+  historyStatus.textContent = rows.length ? `${rows.length} record(s)` : 'no records';
+  footerNote.textContent = historyDate.value
+    ? `Showing history saved for ${displayDate(historyDate.value)}.`
+    : 'Showing recent history from saved local runs.';
+  dateChip.textContent = historyDate.value ? displayDate(historyDate.value) : 'Recent history';
+
+  if(!rows.length){
+    historyBody.innerHTML = '<tr><td colspan="8" class="empty">No article history found for these filters.</td></tr>';
+    return;
+  }
+  historyBody.innerHTML = rows.map(row => {
+    const drive = row.hasDrive
+      ? `<a class="drive-status up" href="${escapeHtml(row.driveUrl)}" target="_blank" rel="noreferrer">Open</a>`
+      : row.entry.upload_drive ? '<span class="drive-status pending">Pending</span>' : '<span class="drive-status pending">Skipped</span>';
+    return `<tr>
+      <td>${escapeHtml(displayDate(row.entry.run_date))}</td>
+      <td>${escapeHtml(row.createdAt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}))}</td>
+      <td class="history-source">${escapeHtml(row.source)}</td>
+      <td class="history-article">${escapeHtml(row.title)}</td>
+      <td>${escapeHtml(row.published ? displayDate(row.published) : '-')}</td>
+      <td>${drive}</td>
+      <td><span class="status-pill ${escapeHtml(statusClass(row.entry.status))}">${escapeHtml(row.entry.status)}</span></td>
+      <td class="history-message">${escapeHtml(row.summary)}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function loadHistory(){
+  try{
+    historyStatus.textContent = 'loading...';
+    historyBody.innerHTML = '<tr><td colspan="8" class="empty">Loading history...</td></tr>';
+    const params = new URLSearchParams({limit:'250'});
+    if(historyDate.value) params.set('run_date', historyDate.value);
+    const response = await fetch('/history?' + params.toString());
+    if(!response.ok) throw new Error('History failed with ' + response.status);
+    historyEntries = await response.json();
+    renderHistory();
+  }catch(error){
+    historyEntries = [];
+    cArticles.textContent = '0';
+    cDrive.textContent = '0';
+    cDraft.textContent = '0';
+    cRuns.textContent = '0';
+    historyStatus.textContent = 'failed';
+    historyBody.innerHTML = `<tr><td colspan="8" class="empty">${escapeHtml(error.message)}</td></tr>`;
+  }
+}
+
+function resetFilters(){
+  historyDate.value = '';
+  searchText.value = '';
+  statusFilter.value = '';
+  driveFilter.value = '';
+  document.querySelectorAll('.source-filter').forEach(item => item.checked = true);
+  dpSyncFromInput();
+  loadHistory();
+}
+
+function setSidebarHidden(hidden){
+  shell.classList.toggle('sidebar-collapsed', hidden);
+  sidebarToggle.setAttribute('aria-label', hidden ? 'Show filters' : 'Hide filters');
+  sidebarToggle.setAttribute('title', hidden ? 'Show filters' : 'Hide filters');
+}
+
+/* ===== Custom date picker (writes to hidden #historyDate) ===== */
+const dpTrigger = document.getElementById('dpTrigger');
+const dpPop = document.getElementById('dpPop');
+const dpLabel = document.getElementById('dpLabel');
+const dpTitle = document.getElementById('dpTitle');
+const dpDowEl = document.getElementById('dpDow');
+const dpDays = document.getElementById('dpDays');
+const DP_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DP_DOW = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+dpDowEl.innerHTML = DP_DOW.map(d => `<span>${d}</span>`).join('');
+let dpSelected = dpParse(historyDate.value);
+let dpView = dpSelected ? new Date(dpSelected) : new Date();
+
+function dpParse(v){ if(!v) return null; const [y,m,d] = v.split('-').map(Number); return new Date(y, m - 1, d); }
+function dpPad(n){ return String(n).padStart(2, '0'); }
+function dpIso(dt){ return `${dt.getFullYear()}-${dpPad(dt.getMonth()+1)}-${dpPad(dt.getDate())}`; }
+function dpSame(a, b){ return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+function dpRenderLabel(){ dpLabel.textContent = dpSelected ? displayDate(dpIso(dpSelected)) : 'Any date'; }
+function dpRender(){
+  dpTitle.textContent = `${DP_MONTHS[dpView.getMonth()]} ${dpView.getFullYear()}`;
+  const year = dpView.getFullYear(), month = dpView.getMonth();
+  const start = new Date(year, month, 1).getDay();
+  const today = new Date();
+  const cells = [];
+  for(let i = 0; i < 42; i++){
+    const dt = new Date(year, month, 1 - start + i);
+    const cls = ['dp-day'];
+    if(dt.getMonth() !== month) cls.push('muted');
+    if(dpSame(dt, today)) cls.push('today');
+    if(dpSame(dt, dpSelected)) cls.push('selected');
+    cells.push(`<div class="${cls.join(' ')}" data-iso="${dpIso(dt)}">${dt.getDate()}</div>`);
+  }
+  dpDays.innerHTML = cells.join('');
+}
+function dpCommit(dt){
+  dpSelected = dt;
+  historyDate.value = dt ? dpIso(dt) : '';
+  dpRenderLabel();
+  historyDate.dispatchEvent(new Event('change'));
+}
+function dpOpen(){ dpPop.hidden = false; dpTrigger.setAttribute('aria-expanded','true'); dpView = dpSelected ? new Date(dpSelected) : new Date(); dpRender(); }
+function dpClose(){ dpPop.hidden = true; dpTrigger.setAttribute('aria-expanded','false'); }
+function dpSyncFromInput(){ dpSelected = dpParse(historyDate.value); dpRenderLabel(); if(!dpPop.hidden) dpRender(); }
+
+dpTrigger.addEventListener('click', (e) => { e.stopPropagation(); dpPop.hidden ? dpOpen() : dpClose(); });
+document.getElementById('dpPrev').addEventListener('click', () => { dpView.setMonth(dpView.getMonth()-1); dpRender(); });
+document.getElementById('dpNext').addEventListener('click', () => { dpView.setMonth(dpView.getMonth()+1); dpRender(); });
+document.getElementById('dpClear').addEventListener('click', () => { dpCommit(null); dpClose(); });
+document.getElementById('dpToday').addEventListener('click', () => { const t = new Date(); t.setHours(0,0,0,0); dpView = new Date(t); dpCommit(t); dpClose(); });
+dpDays.addEventListener('click', (e) => { const c = e.target.closest('.dp-day'); if(!c) return; const dt = dpParse(c.dataset.iso); dpView = new Date(dt); dpCommit(dt); dpClose(); });
+dpPop.addEventListener('click', (e) => e.stopPropagation());
+document.addEventListener('click', () => { if(!dpPop.hidden) dpClose(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && !dpPop.hidden) dpClose(); });
+dpRenderLabel();
+
+refreshHistory.addEventListener('click', loadHistory);
+applyFilters.addEventListener('click', loadHistory);
+clearFilters.addEventListener('click', resetFilters);
+historyDate.addEventListener('change', loadHistory);
+searchText.addEventListener('input', renderHistory);
+statusFilter.addEventListener('change', renderHistory);
+driveFilter.addEventListener('change', renderHistory);
+document.querySelectorAll('.source-filter').forEach(item => item.addEventListener('change', renderHistory));
+sidebarToggle.addEventListener('click', () => setSidebarHidden(!shell.classList.contains('sidebar-collapsed')));
+
+if(window.matchMedia('(max-width: 900px)').matches){
+  setSidebarHidden(true);
+}
+loadHistory();
+</script>
+</body>
+</html>

@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Regulatory Monitor — Dashboard</title>
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAEjUlEQVRYhb3W7W9TVRzA8e+597brXNd1HbAOxh4ypjLQTJElEASixgU1IhE0EPWFwgteoG+MUf4AXxiNiQ+JiiYao0BUfNZAjCExQEJgoBL3iC6M1W1d2dqxsfXh/HyxtWvX264Lwsnam97f3fmcx9+5irRS2bB+iUX8eSU8DDQilAiS9oSQ/Clp39MXybyf9m8KCWuRdoTP3K7xAz09PVOzsZmyrL5lh1LqI5DS2TquH0/VIqlYh2HpbYHePztSDZjBD4OoG4rP3g8lxFgXvHy+W1U2rF/ikETPDe95ekQE4I/By741ptdX9YqCB24yDlBZWjbRaynhkYXidX4H9X4nZbeYCJqRiOafgSkuBWOF4tPPaZ6xgIZCcKdDsXWdly1rS6kst9Baz3wELdPXQCjG0TNjHD07TiyeH5/5a1bV9S0yH95U52L/zioqSo1p0AZPvzc0GuPt78L0BGL5cEAw5sM33lnKa7urC8a11vjcBi/v8LC2sSgvDmDM1/OXnqjENKRgPHm1DNjdWkyD38qJpzXAfs7376xaMH51IkpbR5DxiSimEva0FmOZ2OIIGLlW+9Z13gUNu9bC2PgUr358jne++Iv3jnSgtVBeAptXO2xxEIxcW21Li2dB+ORUjLcOXyAQnEjVlIxtWGna4pKcArt9Xuk1C8bj8QTvf91Bd18EAK/bya4H61LPVLjBX25k4QCGXYar9zsLxhMJzSc/dnGucxiAkmIH+3asxOvOrGOpT2XhIFh26dXrNjPweFzzzfGLiAgPra9FqdmF+dWvf/Pb+QEAnJbB3m23sqS8KKsDnqJsHAFrLi6AaMno+Zn2QQ4d7QbgYl+EvY83oZTwy+l+fjrZB4BpKJ57tJFaf4n96InOwgEsu4MlFIlnDPuyxSW4nCaT0QRn2od490vh7tt8HDzWA4BSsKu1nqa6spxTF56QLHx6F9icar0D0Yw5X+x18eLTzRQ7pwesrSPIh992kkxyW++toWXlorzrJjAiWXj2LpgJXgrGCAxHMxbcimoPL+xcjctpkl7uW+Pn/nv8efFgWBgKZ+OQvgvmnOfH2q5mpdfG5R72PbmKIsd0I9Y2LeKxjTXz7piTnQlbHAFVVXuXzMUFcJjw+u4KfG4DrTUis5UOXrnGv8MT3F7jASQvHookeOMHSOhsPCMTZrROIBYX3vw6zGQ0E9daqPA4aaormxePxjSfn8iNw5zTcO6bTO9gjA9+HmMqlrA98ebDD50ULody45DMAzZ4spzumiQUibOntZjyEgrCQ5EEB09A3zy4IKilNc2jGsrs8PSXCcuEzascbGgyqXBjiw+FNac6Nae68g97KiJElL+2+TiaTfnwuS8TlV6Dah+4XQoRTeSa0H8l91bLgYNS5yxJqE+V0psKxQEGRzWDI3MQmySTFwcU+nsFmy3/8pE24I5C8PRKrwcHCUdNVhhwPG5qtoOEbiIuiDw7FugaNgD6+3/vMhKyAaH9ZvQcke2hoe4jAKnEPjY2NFxXs+jAtagaRPAKlIK4/if8KsIFZciBqMlTowPdZ5Px/wCZx0vwi536kAAAAABJRU5ErkJggg==">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAAABmJLR0QA/wD/AP+gvaeTAAAf5klEQVR4nO3deXwc5Z3n8c9T1Yfuw7YkS5ZlSZaxZWPjIzZHiGMwdxYIsQkDeNkdsmQSTCZh89rZzczOZCaZV2A3yYYQZjOvZJNAgOVIQsLxCiH2Ag4DhMMGS75P2Zatw7asW2p1dz37R6uk7lYfVd3Vl1Tf1yvwqPt5fk91652i1F31lCBT2bDBMf/k8EpNimZFkUuk5CJgAZLZUlAooBAoAkBGKyJjP20qMmLT5EjzBeJ2NVbLcC9r3qx+oA9kH9AL7JNSfKwI2TKWP9Jy7uDBAUtmSSAinZPVNa1dJjVxvYSrgfVAcdxBNubky+i9rHmzIs4Y9IgPeEtI+bIfx0vdp3YetWpWI0k56IaGS6vGBHcKKe9BsMrUYBtz8mX0XunBHOFBsQu0x/LU8mfa2t4ctWoroiVloOua1i7TNPENEHeAdJguYGNOvozeK2OYQ3JOwE+lV/ygs/Ojs1ZtUXgsBz2vfu1Koaj/APJWQEno3bQxJ19G75UdmIPTL4V8yKkV/LC9/d2R5LcrNJaBrq9fWeZT3P8MfAlQA4/amM11nfaYgzrJkwjxXzpP7n4+8e2aGktA1zZedrdEfl9A1eSjNmZzXWcS5pA8r2ru+0+ffv+8qc2KkqRAVyzbUOQeGfkxsCX0GRuzua4zFrOeDqT2hc721lcNbVaMqIkOrGu6dKnq9f8BuCb0GRuzua4zHjNAMULcVVRWLQb7OncYqRgtCe2h5zWu3ShQfsuUz5FtzOa62pgj5HnF7/jLM2d2DpsdCAmArm287G6QvwCcoc/YmM11tTHHyJ/zVHFjW9vHvWYHKmY6z2+4dCvIJ7Exmx2cUK0ZihngslE/22trl80yO9DwHrq2cd1dIJ5kyv8JbMzmutqYjUYKPlZ9jmvPnNl5zugYQ6BrF15+A1J7CXvPbHZwQrVszOOVpATkB6rm2mD0mDruIUdtw6UrkNqvsTGbHZxQLRvzeCWp1xJr/crYUxg8PI75sV1V1YpCxe38o4CasOkS2MLYT9iYbcwTlWR4LdFcXFJVONjftS3e2Jigy+fW/0xINoZNZ3oDbcwWlNF7zTjME7miqKTy8FB/d2us8VGPocc/nnsqbDqz22djtqKM3mvmYtbTJxzKys62j9uidYh4XNLUdGkJyO+GTWdy82INsTGb7mVjBiiVPu051qxxRusQEfSoxneA6qDpTG5erCE2ZtO9bMzBWVfV5ft6tCenHHIEzmdWPsQ+BdTo4IRq2ZjHK5nDrGdI1fxLz5zZezL8iSl7aKEo38TGbHRwQrVszOOVEsMMUOhXlEciPRGyhw5cNqW0YF9pYmRwQrVszOOVEsc8WUPRrus+uSfko7yQPbSmqX+LjdnI4IRq2ZjHK1mAGUBo4p+mPKY3GhourfIK2rEvaDXZ1cZsJlZhntgmjWu7zrRu1x+d2EOPCe60MZvtamM2E8sxA1LhH4KfmQAtpLwniboRn7Ax25gnKqUAM4CAT1XOW3aJ/rMCgT8G7UVgzHS1MZtJqjDrEUK9V28rANLPDRbUxcacQC8bs9FKsZ7bUl9fnwc6aCGuSr6ujdl0Lxuz0UrxOswaGSu+HkBhwwYH8Knk6tqYo/VSFCjKVynKV1CUoF42ZqOVDHURQtwA4Jh/cnilhJLE685czJVlDhqq3cyb46SyTKWy1MmsEgclhYLiPAW3a1ywlJMVpGTYozEwqjEwpHF+wMfZXh/dPT5On/fS1uXlbJ8v4Q2fiZjH/3UjgEOTolmIOANtzCgKLKzJY0VjHisa82muy6PQrUy+A5IIbaZglkC+WyHfpVBRImmsdo73n/zNDI1qHGj3sOfYKK1tHo53etGmILExh3aRC2pqVix2jC82nkDd6Y+5vEjhyuVFrFqUz/KGAgrdChP0IgKOj3mym4zShoI8weqFeaxamAdIhkY09rR5aDnu4d19I/QNT92Dz2zMgfhhtahtXPtrEJvM1Z2+mJ0OwepFBWxcVcwVywpQFTEBOB2Y49X0a7D3hIcdLUP8+cAIHq+M/FJmGGYJCMRDYn7j2p0Ssdp43emJuWGum1uuKGX9iiIK8hSQQa8zSzCHt4dHNd7eN8JrOwc50R20156BmAP/Fq+I2sZ1h4EmY3WnH+amGjd3XDWLKy8uRAjdbvZjntzMwE8txz08t6Ofw6e95t+EJJItmMfTKuY1rusMWQZ3hmC+uCGfz3+6nHXNhWGAcw9zcPvgqTFefHeInUei3f1h2mIGOClqG9cNAQWx604fzLUVTh64tYpVi/IjAM5tzDJo0pZjHn6xrZ+OHv/UN8GCZCFmELJf1Dau0wAx3TG7nII7NpRzx4ZZOB36H3rTE7Pe9mmSbbuGeW7HIB6vZvDNip+sxDz+2xK1jeui/Jk8OTTXMV/aXMT9t1Ywt9wxOXqaYw5ud/f6eWJbPx8d88R+rwwkizEDIGob1kWpnPuYXQ7Bl2+u4KbLSgnyNKMwB/oEfvi3vSP8/I8DeLyJ/VazHTNEBZ37mOdXuPj7u6tZUO2yMQe1O3p8PPpSP6fOGv16fWqd5JI6zBARdO5jvmZ1CX99WyVulyDI04zHrMfjhef/NMhru4wtkp8rmAEckTrlKmZVETy4qZLrPlEawGRjjtAGl0Oy5epCaueoPLF9AF+MvxdzCTOEgM5tzHkuhf++pYZ1iwtszDEwB9f59HI3s0sVHn2xn9GxCO98jmGGiWsKcxtzUb7Kw/+p1saMccx6e9l8J/9tcynFBaGLaOUiZghagyNXMc8ucfC//qqWpQvybMwmMetdGuaqfOP2UmaXKFPGJpf0Ygb9EixDXeMl/Zgryxw8+kAd9dVuG3OCmPU6NbNU/vb2UsqLrLpbdvoxAyi5irmkUOU7X6ilotRhY04Ss55ZxYK/2VxKSYGpm6NFSGYwg8nbukVO+jG7XYJv/Yd51FW6bMwWYdbHVpUqfPWWIvJcie6pM4cZkgadfsyqIvj7LfPsY2asx6z3bZzr4IHPFKEqZlFnFjMkBTr9mAEe3FRpf5pB6jDr7aV1Tu65ugDjyTxmSBh0ZjDfsLbU/tKE1GPW+1651MUVzS7iJzswQ0KgM4O5vtLF1lsqbcxpwqy3t2zIp3pWLCbZgxlMg84M5jynwt9tqcblmhxmY049ZpCBMxZvLMIVcV3a7MIMpkBnBjMSvnJbJXVV9llzkdtmaprDrLdrZincuT6f0GQfZqRh0JnDvHZxIdesKbYxR2ybqZkYZn3clUtdLK93TDwfNxnADNII6MxhdjkFWz9bYWOO2DZTMznMev7iyjycMe89PFHCyENRHzWdoNcUB3TmMAPcdfVsqmc5Jx+yMZuqOTjs5UTnICc7Bhnx+JKev6JU4YY1cT71yCBmmHI+dJQJM4B5XoWLzevLJh+yMRuq6dc03vqokzd2nuFU19DEOCEEjTVFbFxbw5olFQiR2Pw3rHLz/iEvXb0RTqLOMGYAtaR83j/GnDADmAH+7q5q5lU4bcwmMF8YGOV7T7eyY1cH/UNTF5y5MDDGzgPnaesYYEVTOQ5V/w+08fkVBSpKFd4/FFY/CzBDxEOOzGNeubBg2q+bYTXmvkEPDz++m7YzA8TLnqMX+OFz+/D6tYTmXzbfwaLqoIPpLMEMU0BnHjPAnRvLbcwmMI94vPzgmT2c7Y22WtLUHDs9wCtvnUx4/hv1Y+kswgwhoLMD85L5eVyysMDGbLCm3+/nX361n5Odg5jN9g87GBj2JjR/c62DBXOmfuSRScwQdglWInNbiRngzo2zbMwGa2qaxo9fOMC+4xdIJD6fRsuRCwnPf+MaZ0i9TGOG8NsgZxhzY7WbdYuDltmzMces+dQfjrDrwDmSyYnOyWNus/MvX+Bg3uzxy7YiVk8vZknwIUeGMQPcfHlpTi9pm07ML+44wZs7O0g2I6P+hOaXEoSA9cscWYMZdNBZgNnlEKxfUWRjNlDzjQ87ePFPJ7Ai+XlqQpj19upGBw41/EKAzGAGUMzOnQrMAJcvzZ2V88ebEy8onZg/3H+Op187glWZX1Vkav7wdoFbsLwu+MOyzGEGk6ePpgozwMbVRTbmODUPtvXx098eQNOsQeN0KKxsKjc8f6S2BNYtMnHSkpEkiBlMgE4l5rJCldWL8ie72pin1GzvGuJHv9o7/mWINbl6zVwK8x1JYUZKltWpFOZZtFFJYAaDoFOJGSTrVxRm3d2msglz94VRvv9/WxkeNbdiaKw01hRx0ydrk8YMga/DVzUYOQ0vTpLEDAZApxozwMqJr7kD/7AxT9YZGPLyyDOt9A2OYVXmlLv54m2LcShK3PnjYdbbi+dZsYBAcpghDuh0YFYUuLg+38YcoaZnzM+jz++l8/wIVqW4wMkDm5opznfGnd8oZoBF1er4GXwJxCLMEAN0OjBD4HbDRXkqNubQmj6f5LFf7+Noez9WJd+l8sDmJVSU5cWd3wxmCRS6BfNiXkwbJRZihiig04UZ4JLGfGzMoTU1DR5/5RB7jyb2lXakqKrgvs9eRG1lYdz5zWLW/7GoJpFrrq3DDBEuwUonZoAVjXk25rA6z28/yjutXVgVIeDef9fE4rpSQ/OHt41glsBF1WavubYWM4TtodONWQhYUpdnYw6q8/t3TvHH905jZW6/up6Vi2Ybmj+8bRQzEhoqDR5EpwgzBIFON2aAyjInhW4lAraZifnPrV288MZxrMxnPlnLp1fNNTR/eNsMZpDkuwVlhXFQpxAzRF0fOvWYAernumzM43VaDvfw85cPhdRMNleurOSmy2sNzR/eNotZb9eUxwCdYswQcX3o9GAGqJ0z/tHRDMd87PQA//rCfvwWfaUNsGJhOXdc3WBo/vB2opgBKkqjgE4DZoh1CVbSM8evVVnmmPGYz5wb5pFn9+DxBt+TO7ksml/CvbcsQtEv30gTZolkdqQ7AKQJM0S7BCvpmY3VqijTz6WdmZh7Bzw88swehkamXqGdaGoqCvjirRfhHD+lM52YkTBr8uQ9wgbHjBWYIdIlWEnPbKyWJHDDn5mKeXDYy/efbuV8n/ELW+NlTqmbr2xeQkGeGnf+8LYVmAGKg/8oTDNmZPglWEnPbBwzELiV2AzE7PVpPParfZw5Z+xOrkZSVODk/s3NlBQ6484f3rYKs0RS5BSEDY4ZKzFDzJWTzM5sDjNAkTvo+oI0YO6+MMK+4z2cuzCKQxVUVxTQXD+LwnyH3mVi0lRh9muSH/9mP4dP9UV7i0zH7VTZumkJVeXuuPOHt63EjIQCtySkU4xYjRmMgk4BZiEgzz35V0sqMbd3DfLk7w+w+9C5EJwQOMn902tquH1jE0UFgU9dUoVZSnjilUPsPnw+yjtkPqoquO/Wi6irKog7f3jbaswQWGAzU5jBCOgUYAZw6DekSTHm91o7eey5VsZ8kT9F8Po0tr/XzscHz/M396ykpqJwYgOsxAzwmzeO83aLtV9p33PDQprrSwzNn2rMEhBIVAH+GCxShRninQ+dIswADpWUY95/rIcfPrs7KubgnOsd4Z9/tpNTXYOkAvO290/z6jun4m6HmWzaUM8nmmcbmj8dmPU6DmNLgMaJecwQC3QKMU95LgWYfV4///qbPfhj7SrC0j80xkO/2BWyCpEVmN/b081z244Z3g4jufbSGq5aU2Vo/nRiNvT7jpvEMEM00GnAPLHTTNEfgO/t66LzvPlPEfqHxnj48Y841TVoCeY9xy7ws5cPhYxPNpctq+DWK+cbmj/tmKXEF+FKsXRghkig04AZwKfJlGGWkNSKQjrq9vH1lRPF3NYxyI9/vQ+/hRe2XtxYzl3XNwQW5MlCzFJOPX5OF2YIB50mzBBAMuzRJgZY/Tlze1f8ZWVjpX9ojIef+IhTIYcf4/NHbAd+1ttnL4zy6LN7GB2z7ivt+uoi7r15YeCC4izEDDAStndOJ2YwtRSYdZh1kQOjWkowSxlYiDDZ9A+N8fAvP6a9a8gU5r7BMb7/9G76hqy7sLV6dj5bNy3G7VSzFrMEhoMuf0w3ZjC8FJj1mAEGhrSUYAZJeYk1C0UMTKAeDKk/2Q78rLdHPD5+8EwrZ3s9lswPUF7sZuvmxRTkRVpDI3T+TGJGMvFf3UxgBmlkKbDUYAboGfAGPWwdZoDFC8oMbZGRDAyN8T+e3D1+z5LomLx+jUef3xtyb5NkU5DnYOvmxZQXu7MeM0j6RzKHGczcBcuKXmEdu3v9KcEsJaxfXY06ZRHBxDMwNMb/fHI37d1DEQFpmuQnLxzg0AnrvtJ2ORS+/LnFVM/OzwnMEjhv+E8X6zFDTNCpxQzQfcGXEswgmVOWz01XLDC0dUYTQN1Ce3dgTx38SdzTrx1h18Hk1moOjqoIvnBzE401RTmDGQk9Q0b+dkkNZogKOvWYAU6f84Z1sQaz3r79miaWN80ytJVGMzA0xnef2j3xkR7AizvaLFmrWY8QcOd1jVy8sDynMIOkO+5/oFKHWRLvLlhJzxsdM0Bb11jKMAOoKjx41yUsa7QatZfvPt3C6e4h3tzZwUtvnbS0/q1Xzufyi+fkHGYJdMRcSiS1mCHBS7CswAxwrt/P0Kg20ddKzPov2+VU+fqWFSxtKDe01UYzMOTl4V/utnStZoCrVs/l2ktrchLzsAf6R6L90lOPGRK4BMsqzBB4jw60e1KGWW87HSpf32L9nnp41GfZWs0An1gym01XLchJzEhoO5tZzGDyEiwrMevZc9yTUsx62+VUefCu5SxrtHZPbVUW15Xw729oHP8p9zBL4GhnpF98+jCDiUuwUoEZoPX46MS4VGEO9JHjqK0//Eg2dVWF/NVtF6Gq4cvbQq5gBsnhKaDTixkSXvA8Si+TmAGOd40xNKKlHLMep0PhwbuWZw3qOWVuvrxpMa7ACeJAbmIeHoXO3uBXln7MkNCC51F6JYAZQNNgT9v418Qpxqy3XU6Vr92ZedTFBU62bl4SYa1myCXMSDjcFbq9MZMizGB6wfMovRLErKfluCdtmPWxLqfC1+68mOb6zKDOc6t8ZfMSKkrD12qGXMMsgaMTH8NnDjOYWvA8Sq8kMQO8u28Er/4FUxow63WcDpWv3bks7XtqVRXcd8siaioKMPqashmzX0LLKTk5YbSkGDMYXvA8Si8LMAP0DfvYfXQkrZj1tsup8td3pA+1EPCXn4m0VnNge3INM8CBdo1hT+YxQwTQ6casF/pT63DaMevtAOqlNNdbd4ZetATWap6F0deU7ZiRkp3HswMzxF3wPMqEFmMG+ODQCMOjWtox63WcjsCeOpWob7qilvUrqyLOn6uYh8fgQKz12dOIGRlzwfMoI1KAGcDrg7f3jUw8nk7MetvlVPnK55eyxMJzqfV8amUlN10+L+b8uYZZAi0nJVEvmUwzZoi64HmUESnCrD/y6oeDaFJmBLM+1uVU+YrFhx8rFpZz+1X1cebPPcwSePdglBedAcwQccHzKCNSjBng1Fkfuw57Jh5JN2b9eZdD4YHPN1uCuml+Cffe3BS2VnP015QrmAH2n5J09kWAkSHMEOEuWBFHpAGznhfeCVzykCnMel+nqrL19uRQ11Tk88VbFuEIWas5+mvKJcxIyev7sgszGLkEK42YAY6c9tJyfGyiRyYwTxxTOxTu39yc0DH1nFI3D2wKX6s5+mvKNcwHO6A9fM3JDGOGeJdgpRmz/uBv3xkg05j1vi6Hwtbbl4x/bmwsxQVO7t+0JGyt5vD5cxezBN4I3ztnAWaIdQlWhjAD7DsxRssxz8QTmcKst51q4Jh67dKKSFsekrmz8njwL5ZSGbJW89SauYz5YAe0dQe96CzBDKAWl1X/45QRGcSs5/AZLxtXFqAE3+EgA5j1tqoIVl00i/rqIvoHvfQOjIXUrCrP4/rLarj7ukaKC40toJ6LmP0a/PJPgc+fJwsbTWoxA4jqBatlSKcswKzn9iuLuO2TgfWaM4k50vwer59zvR58fklZsZOSAqepmrmIGWB7i+T/7Z14OSaSeswQfglWFmEGePHPQ3T3+rMOMwRuA1Ezp4C6qoIZg/n8AOw4MPFyTCQ9mCH4Eqwswwww5tP4+bb+ySFZgtn8/LmPGQkv75SBZZCzFDPol2BlIWa9U8sxDztaR2zMGcb8/tHAR3XZjBkwsrZdQrNH3wQTmPX8YtsAJ7oD67TamNOPubNX8sougjobSfoxg8FrCk3OHn0TEsAM4PVJfvRy3/jKljbmZGqaxezxSZ55J3DymPFkBjNYAjq1mPV09vh58nVjS9oGHrcxJ4tZInnxQwws7xWczGGGpEGnB7Oet/aM8mbL6ERfG7Pxmolgfv8IfHQcE8ksZkgKdHox63li+wC7j3ltzCZqJoL5wBl4aScmknnMkDDozGAG8Gnwo5f7OHzGi405NZjbz8OzbweWmDCW7MAMCYHOHGY9Yz545MV+Tp+fvCGPjXlqOxHMXX3w+JuB99hYsgczmAadecx6Bkck33thgPP9mo05QjsRzL3D8MSbTJ6nETfZhVliCnT2YNbTM+Dn28/00n7Ob2NOEnN3P/xkG/Qavldp9mEGw6CzDzMEIF4Y0vjO8/oxtY05EcyneuAn23MfMxi9BCvuI9EeTKiToQRDHPYEDj92H/NOzGNjnnxhsTAfOAP/Z3tgsXJjyV7MkMBdsLINs54xn+SxVwZ4a6/Hxhz0wmJh/uAoPPUWeA3f7Da7MQOI6rpVUSrnDubwXNHsYsuGfFyOyasDbMwTLwGvX/LyLvjA1N00sh8zRAWdu5j1zC1X+dINBdTOUW3Mky+Brv7AuRldMW/uE57cwAwRQec+Zj1OVbDpijw2XuKaUmMmYt51XPK7D3PnRKPY5SLXCgM9fTAHZ0mtg7vW5zG3fPzW5jMMc88AvLQzN85nNlYuSi0ZAK0BYrpi1uNU4YY1Lq5f5cap6rVhOmP2+eHNfbBjf/ZfaWK8XHTMgBTVdav7QSuOuT2mtiv7MAdvU2Wpwh2fymPZfMfE49MR88EOeOlDSc/glLfAQHISM8CgqK5beQqojbsJ0wBzcJrmqly/ysWyOgdCBPpNB8xtZ2Fbq+RoV9y3IEpyFjNAh6iuW7kHWBZz2DTDHJz5s1U2XuJgbZNzCuxcwSyBA6clr++RnMrC5bkSjUnMIDgkaupWviLhM1GHTWPMwV3mzVJYf7GD1Y0OCtwiJzAPjwXWZ373IFm3CmiyMY05kA/E3LpVDwvkf53JmIMfcqiC5lqFdYscXFKvBpbBzSLMmoRjnRo7j0PrKRn9I7iZhxkBzzmEkK0RHc1AzAA+v6T1hJ/WE34K82BVg8qSeQpN1SqFbkEmMA+PSo50wZGOwN2msuUGPVMHZA4zAEIcFNULVjdLqe0zPMhcJ0PJFsyxHhUicFiyqEbhomqFhiqFfBcpwTzsCdwI/kiH5GiXpKOXkD9Yzb4+o51zGjMgJFsEwNz5K08gqDO+XTMLc7SUFQpqygUVpYJZxYI5RYLifCh0CwrdEpdTRMQ86oWhERjyaPSPBJbY6hnS6O6Hzh5J34iJF2B+syN2znXMAIrmX+0AkILXBNxnYzZYazy9Q5LeIQnt0cpIBAT25MDI2NTqxmezMcdJ39mzR1oUAEXIV23MBmsZSdCBtSRwSdOwjTlOuaQwA+wA/AqAW5S/CvQYnTrZzBTMcbsZL2hFoSmdpxFmJLwO4yf4t7W9OYqQTxuZOtnYmG3MoRWSxwwgVPkaBN94U9N+aknlGLEx25hDK1iDGfjg/JlDByAIdFd7ayuIt5KtHC02ZhtzaAXLMAPaU3or5JpCTchvJ1k5YmzMNubQClZill4H2rP6TyGgu09+vA34NxuzwdiYEyhnKWYQPNvVdXTinlxTrvrWBN9KpHTE6WzMNmZSiBk0hHwo+NEpoLtPfrxNwu8SmSJkOhuzjZmUYkbAb853HN4f/EzEdTlUv+OrwFAiU4GN2dxsNuYEq/r8KN8Of1aNNGRgoKOvsGyuJuAa09PZmG3MpBwzIB7r6Tr4RHiPqCsndZ0s/56QvGNqOhuzjZl0YKbT7/F8M1KvGEuBvemTDnE3YOgOGzZmG3NohZRhRsCDvb1tvZF6xlzbrrPt4zaJ/FLc6WzMNmbSgxnJ4+e6Dj0buW+UY+jgDPV37SkqnVsMXBFxOhuzjZk0YRYcEn5x2/Dw+ahLsscFDTDY37W9sHTuCgHNIdPZmG3MpAkzDEqhXXu++3Cks88nYnQFf031O7YAH0xMZ2O2MZM2zGNSys/1dB7ZG2+k4VtSnDmzc9gltOuBD2zMNubQCinFLJHc19N9eJuR0aZuGnTyZOuFcdQfmhkXOTZmG3PcQRpSbD3ffeiXRiuI+F2mpqx+ZZnbp/0euDyR8TZmU4WmdJ4hmMcE8j+e6zr8jJkqhv4oDM9ob+dodWXxU16/sw64xNxoG7ONOe6gIamJz53vPmT6nKKEQAP09PT4B/u7fldUUtULXIehvb2N2cYcd9ABTYobL5w9+HYi1RIGrWeov+u9gpKq9wVcDUxZlncyNmYbc5xBkscdIu+z57r3xfxoLlYSOoaOlNraZbO8Uv3fCO6Y+qyN2cYcc1CHgP8c6xtAo7EMtJ6585bfLoX4HoyvxGRjtjFHH+QD+S/amP+bFy4cM3TOULxYDhqgvr4+b9RX/FUJ3wBKY3a2MUftPI0xa0j5gibUb13oOtCaSJVoSQloPTU1a+b4hedrCPFFoGJKBxtz1M7TFLMXwbMI+VD4lSZWJaWg9TQ1NbkHPfl3SslW4BOAjTlG52mI+UPQnnQK+Uxn55GziW6XkaQFdHCqFqxowM8tSHkLsB4ILBgZsbeN2dzwrMHcB+yQ8Lqi8odzZw4eTHrDDCbtoINTUbGsSLiU5SAvAbFSwBIJ5UAZQpYhKUl6EhtzAuXiYh4M/E8OgugR0CbhkEDsF5pv/9mzR1oAw3cQtzL/Hz1kRFGx83GPAAAAAElFTkSuQmCC">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F2F3F6;
+    --surface:#FFFFFF;
+    --sidebar:#161B2C;
+    --sidebar-2:#1D2338;
+    --sidebar-line:rgba(255,255,255,0.09);
+    --sidebar-text:#C7CBDA;
+    --sidebar-text-dim:#7D8299;
+    --ink:#1A2033;
+    --muted:#67707F;
+    --line:#E4E6EC;
+    --brass:#B8842E;
+    --brass-dark:#8F6620;
+    --brass-soft:#FBF2E1;
+    --ok:#1E8A5C;
+    --ok-soft:#E4F5EC;
+    --seal:#C13B4E;
+    --seal-soft:#FBE9EC;
+    --info:#3B5FC1;
+    --shadow-sm:0 1px 2px rgba(20,24,38,0.06);
+    --shadow-md:0 4px 14px rgba(20,24,38,0.08), 0 1px 2px rgba(20,24,38,0.06);
+    --shadow-lg:0 12px 28px rgba(20,24,38,0.14), 0 2px 6px rgba(20,24,38,0.08);
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; }
+  ::-webkit-scrollbar{ width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb{ background:#3A415A; border-radius:8px; }
+  ::selection{ background:var(--brass-soft); }
+
+  /* ================= SHELL ================= */
+  .shell{
+    display:grid;
+    grid-template-columns:296px 1fr;
+    min-height:100vh;
+    transition:grid-template-columns .22s ease;
+  }
+  .shell.sidebar-collapsed{ grid-template-columns:0 1fr; }
+  .shell.sidebar-collapsed .sidebar{
+    transform:translateX(-100%);
+    opacity:0;
+    pointer-events:none;
+  }
+  @media (max-width:900px){
+    .shell{ grid-template-columns:1fr; }
+    .sidebar{ position:relative; height:auto; }
+  }
+
+  /* ================= SIDEBAR ================= */
+  .sidebar{
+    background:linear-gradient(180deg, var(--sidebar) 0%, var(--sidebar-2) 100%);
+    color:var(--sidebar-text);
+    padding:22px 18px 26px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    transition:transform .22s ease, opacity .22s ease;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:2px 4px 20px;
+    border-bottom:1px solid var(--sidebar-line);
+    margin-bottom:20px;
+  }
+  .seal-mark{
+    width:40px;height:40px;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    box-shadow:0 3px 10px rgba(0,0,0,0.4);
+    overflow:hidden;
+  }
+  .seal-mark svg{ width:100%; height:100%; display:block; }
+  .brand-text h1{
+    font-family:'Newsreader', serif;
+    font-weight:600;
+    font-size:16.5px;
+    color:#F4F1E9;
+    margin:0;
+    letter-spacing:0.1px;
+  }
+  .brand-text p{
+    margin:2px 0 0;
+    font-size:10.5px;
+    color:var(--sidebar-text-dim);
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+  }
+
+  .side-section-label{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.09em;
+    color:var(--sidebar-text-dim);
+    font-weight:600;
+    margin:0 0 10px;
+    padding:0 2px;
+  }
+
+  /* ===== Custom date picker ===== */
+  .datepick{ position:relative; margin-bottom:20px; }
+  .dp-trigger{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    padding:9px 11px;
+    border:1px solid var(--sidebar-line);
+    border-radius:7px;
+    background:rgba(255,255,255,0.05);
+    color:#EDEFF5;
+    cursor:pointer;
+    transition:border-color .12s, background .12s;
+  }
+  .dp-trigger:hover{ background:rgba(255,255,255,0.08); }
+  .dp-trigger[aria-expanded="true"]{ border-color:var(--brass); }
+  .dp-cal-icon{ width:15px;height:15px; color:#DCC488; flex-shrink:0; }
+  .dp-trigger span{ flex:1; text-align:left; letter-spacing:0.02em; }
+  .dp-chevron{ width:14px;height:14px; color:var(--sidebar-text-dim); transition:transform .15s; }
+  .dp-trigger[aria-expanded="true"] .dp-chevron{ transform:rotate(180deg); }
+
+  .dp-pop{
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;
+    z-index:40;
+    width:262px;
+    background:#1A2036;
+    border:1px solid rgba(255,255,255,0.11);
+    border-radius:11px;
+    box-shadow:0 16px 40px rgba(0,0,0,0.5);
+    padding:13px 13px 11px;
+  }
+  .dp-pop[hidden]{ display:none; }
+  .dp-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:11px;
+  }
+  .dp-title{
+    font-family:'Newsreader', serif;
+    font-size:15px;
+    font-weight:600;
+    color:#F4F1E9;
+    letter-spacing:0.1px;
+  }
+  .dp-nav{
+    width:28px;height:28px;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--sidebar-line);
+    border-radius:7px;
+    background:rgba(255,255,255,0.04);
+    color:var(--sidebar-text);
+    cursor:pointer;
+    transition:.12s;
+  }
+  .dp-nav svg{ width:15px;height:15px; }
+  .dp-nav:hover{ background:var(--brass); border-color:var(--brass); color:#1B1204; }
+  .dp-dow, .dp-days{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:2px;
+  }
+  .dp-dow{ margin-bottom:4px; }
+  .dp-dow span{
+    text-align:center;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    color:var(--sidebar-text-dim);
+    text-transform:uppercase;
+    padding:4px 0;
+  }
+  .dp-day{
+    aspect-ratio:1;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--sidebar-text);
+    border:1px solid transparent;
+    border-radius:7px;
+    cursor:pointer;
+    transition:.1s;
+  }
+  .dp-day:hover{ background:rgba(255,255,255,0.09); }
+  .dp-day.muted{ color:#4A5170; }
+  .dp-day.today{ border-color:rgba(220,196,136,0.55); color:#DCC488; }
+  .dp-day.selected{
+    background:linear-gradient(155deg, #D4A146, var(--brass-dark));
+    color:#20140A;
+    font-weight:600;
+    border-color:transparent;
+  }
+  .dp-day.selected:hover{ filter:brightness(1.05); background:linear-gradient(155deg, #D4A146, var(--brass-dark)); }
+  .dp-foot{
+    display:flex;
+    justify-content:space-between;
+    margin-top:11px;
+    padding-top:10px;
+    border-top:1px solid var(--sidebar-line);
+  }
+  .dp-link{
+    background:none;
+    border:none;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12px;
+    font-weight:600;
+    color:var(--sidebar-text-dim);
+    cursor:pointer;
+    padding:2px 4px;
+    border-radius:5px;
+    transition:.12s;
+  }
+  .dp-link:hover{ color:#EDEFF5; }
+  .dp-link-accent{ color:#DCC488; }
+  .dp-link-accent:hover{ color:#F0CE8C; }
+
+  .source-group{ margin-bottom:16px; }
+  .source-group-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:11px;
+    letter-spacing:0.05em;
+    color:#DCC488;
+    font-weight:600;
+    text-transform:uppercase;
+    margin:0 0 7px;
+    padding:0 2px;
+  }
+  .source-group-title svg{ width:13px;height:13px; opacity:0.85; flex-shrink:0; }
+  .source-row{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:6px 8px;
+    border-radius:7px;
+    cursor:pointer;
+    transition:background .12s;
+  }
+  .source-row:hover{ background:rgba(255,255,255,0.06); }
+  .source-row input[type="checkbox"]{
+    appearance:none;
+    -webkit-appearance:none;
+    width:15px;height:15px;
+    border-radius:4px;
+    border:1.5px solid #4A5170;
+    background:rgba(255,255,255,0.03);
+    flex-shrink:0;
+    position:relative;
+    cursor:pointer;
+    transition:.12s;
+  }
+  .source-row input[type="checkbox"]:checked{
+    background:var(--brass);
+    border-color:var(--brass);
+  }
+  .source-row input[type="checkbox"]:checked::after{
+    content:"";
+    position:absolute;
+    left:4px; top:1px;
+    width:4px;height:8px;
+    border:solid #1B1204;
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+  .source-row label{
+    font-size:12.8px;
+    cursor:pointer;
+    color:var(--sidebar-text);
+  }
+
+  .side-div{
+    border:none;
+    border-top:1px solid var(--sidebar-line);
+    margin:6px 0 16px;
+  }
+
+  .toggle-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 4px;
+    border-radius:7px;
+  }
+  .toggle-row .t-label{
+    font-size:12.8px;
+    font-weight:500;
+    color:#E7E9F2;
+  }
+  .toggle-row .t-sub{
+    font-size:10.5px;
+    color:var(--sidebar-text-dim);
+    margin-top:1px;
+  }
+  .switch{ position:relative; width:34px;height:19px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{
+    position:absolute; inset:0;
+    background:#3A4160;
+    border-radius:20px;
+    cursor:pointer;
+    transition:.15s;
+  }
+  .slider::before{
+    content:"";
+    position:absolute;
+    height:13px;width:13px;
+    left:3px; top:3px;
+    background:#EDEFF5;
+    border-radius:50%;
+    transition:.15s;
+    box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  input:checked + .slider{ background:var(--ok); }
+  input:checked + .slider::before{ transform:translateX(15px); }
+  .switch.danger input:checked + .slider{ background:var(--seal); }
+
+  .safety-note{
+    font-size:11px;
+    color:var(--sidebar-text-dim);
+    background:rgba(255,255,255,0.05);
+    border-left:2px solid var(--seal);
+    padding:9px 10px;
+    border-radius:6px;
+    margin:12px 0 18px;
+    line-height:1.5;
+  }
+
+  .side-actions{ margin-top:auto; padding-top:6px; }
+  .btn{
+    width:100%;
+    padding:11px 14px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    border-radius:8px;
+    border:1px solid transparent;
+    cursor:pointer;
+    margin-bottom:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:filter .15s, transform .08s, box-shadow .15s;
+  }
+  .btn:active{ transform:translateY(1px); }
+  .btn svg{ width:14px;height:14px; flex-shrink:0; }
+  .btn-secondary{
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.14);
+    color:#EDEFF5;
+  }
+  .btn-secondary:hover{ background:rgba(255,255,255,0.11); }
+  .btn-primary{
+    background:linear-gradient(155deg, #D4A146, var(--brass-dark));
+    color:#20140A;
+    box-shadow:0 4px 12px rgba(184,132,46,0.35);
+  }
+  .btn-primary:hover{ filter:brightness(1.07); }
+
+  /* ================= MAIN ================= */
+  .main{ padding:26px 34px 60px; width:100%; }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:22px;
+  }
+  .topbar-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .sidebar-toggle{ flex-shrink:0; }
+  .topbar h2{
+    font-family:'Newsreader', serif;
+    font-size:23px;
+    font-weight:600;
+    margin:0 0 3px;
+  }
+  .topbar .sub{
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .date-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--ink);
+    background:var(--surface);
+    border:1px solid var(--line);
+    padding:8px 13px;
+    border-radius:8px;
+    box-shadow:var(--shadow-sm);
+  }
+  .icon-btn{
+    width:36px;height:36px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    color:var(--muted);
+    box-shadow:var(--shadow-sm);
+    transition:border-color .15s, color .15s;
+  }
+  .icon-btn:hover{ border-color:var(--brass); color:var(--brass-dark); }
+  .history-btn{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    height:36px;
+    padding:0 14px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    box-shadow:var(--shadow-sm);
+    color:var(--brass-dark);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:13px;
+    font-weight:600;
+    text-decoration:none;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .history-btn svg{ width:15px; height:15px; }
+  .history-btn:hover{ background:var(--brass-soft); border-color:var(--brass); }
+  .icon-btn.spinning svg{ animation: spin .7s linear; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-md);
+  }
+
+  .counters{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:18px;
+  }
+  @media (max-width:700px){ .counters{ grid-template-columns:repeat(2,1fr); } }
+  .counter{
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    background:var(--surface);
+    box-shadow:var(--shadow-sm);
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .counter .icon-wrap{
+    width:34px;height:34px;
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .counter .icon-wrap svg{ width:17px;height:17px; }
+  .counter.c-matched .icon-wrap{ background:var(--brass-soft); color:var(--brass-dark); }
+  .counter.c-drive .icon-wrap{ background:var(--ok-soft); color:var(--ok); }
+  .counter.c-draft .icon-wrap{ background:#EAEDF7; color:var(--info); }
+  .counter.c-sent .icon-wrap{ background:var(--seal-soft); color:var(--seal); }
+  .counter .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:21px;
+    font-weight:600;
+    line-height:1;
+    color:var(--ink);
+  }
+  .counter .lbl{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:3px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+
+  /* ===== Notifications / pending review ===== */
+  .bell-btn{ position:relative; }
+  .bell-badge{
+    position:absolute;
+    top:-5px; right:-5px;
+    min-width:17px; height:17px;
+    padding:0 4px;
+    border-radius:9px;
+    background:var(--seal);
+    color:#fff;
+    font-size:10px;
+    font-weight:700;
+    font-family:'IBM Plex Mono', monospace;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 2px var(--surface);
+  }
+  .notif-panel{ padding:18px 20px; margin-bottom:18px; }
+  .notif-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .notif-head h3{
+    display:flex; align-items:center; gap:8px;
+    font-size:13.5px; font-weight:600; margin:0;
+  }
+  .notif-head h3 svg{ width:16px; height:16px; color:var(--brass-dark); }
+  .notif-head-actions{ display:flex; gap:8px; }
+  .notif-count{
+    background:var(--seal-soft);
+    color:var(--seal);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; font-weight:700;
+    padding:2px 8px; border-radius:20px;
+  }
+  .btn-check{
+    display:flex; align-items:center; gap:7px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    color:var(--brass-dark);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12.5px; font-weight:600;
+    padding:7px 12px; border-radius:8px;
+    cursor:pointer;
+    box-shadow:var(--shadow-sm);
+    transition:border-color .15s, background .15s;
+  }
+  .btn-check svg{ width:14px; height:14px; }
+  .btn-check:hover{ border-color:var(--brass); background:var(--brass-soft); }
+  .btn-check.spinning svg{ animation:spin .7s linear; }
+  .notif-list{ display:flex; flex-direction:column; gap:10px; }
+  .notif-item{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    padding:13px 14px;
+    border:1px solid var(--line);
+    border-left:3px solid var(--brass);
+    border-radius:9px;
+    background:#FCFBF8;
+  }
+  .notif-item.busy{ opacity:.55; pointer-events:none; }
+  .notif-main{ flex:1; min-width:0; }
+  .notif-src{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.8px; font-weight:600;
+    color:var(--brass-dark);
+    text-transform:uppercase; letter-spacing:.03em;
+  }
+  .notif-title{
+    font-size:13.5px; font-weight:600; color:var(--ink);
+    margin:3px 0 2px; line-height:1.4;
+  }
+  .notif-meta{ font-size:11.5px; color:var(--muted); }
+  .notif-meta a{ color:var(--info); text-decoration:none; }
+  .notif-meta a:hover{ text-decoration:underline; }
+  .notif-actions{ display:flex; gap:8px; flex-shrink:0; }
+  .btn-accept, .btn-deny{
+    display:flex; align-items:center; gap:6px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:12.5px; font-weight:600;
+    padding:7px 13px; border-radius:7px;
+    cursor:pointer; border:1px solid transparent;
+    transition:filter .15s, background .15s;
+  }
+  .btn-accept svg, .btn-deny svg{ width:13px; height:13px; }
+  .btn-accept{ background:var(--ok); color:#fff; }
+  .btn-accept:hover{ filter:brightness(1.06); }
+  .btn-deny{ background:var(--surface); color:var(--seal); border-color:var(--line); }
+  .btn-deny:hover{ background:var(--seal-soft); border-color:var(--seal); }
+  .notif-empty{
+    display:flex; align-items:center; gap:9px;
+    justify-content:center;
+    padding:26px 16px;
+    color:var(--muted); font-size:12.5px;
+  }
+  .notif-empty svg{ width:18px; height:18px; color:var(--ok); }
+
+  .results-panel{ padding:20px 20px 8px; margin-bottom:18px; }
+  .results-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .results-head h3{
+    font-size:13.5px;
+    font-weight:600;
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .pulse-dot{
+    width:7px;height:7px;
+    border-radius:50%;
+    background:#4A5170;
+  }
+  .pulse-dot.live{
+    background:var(--ok);
+    box-shadow:0 0 0 rgba(30,138,92,0.5);
+    animation:pulse 1.4s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(30,138,92,0.45); }
+    70%{ box-shadow:0 0 0 6px rgba(30,138,92,0); }
+    100%{ box-shadow:0 0 0 0 rgba(30,138,92,0); }
+  }
+  .run-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--muted);
+  }
+  .log{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    background:var(--sidebar);
+    color:#C7CBDA;
+    border-radius:8px;
+    padding:12px 14px;
+    min-height:96px;
+    max-height:300px;
+    overflow-y:auto;
+    margin-bottom:18px;
+    line-height:1.7;
+  }
+  .log .ok-line{ color:#7FD6A6; }
+  .log .brass-line{ color:#E3BD73; }
+  .log-empty{ color:#5D6479; }
+
+  .table-wrap{ overflow-x:auto; }
+  table{ width:100%; border-collapse:collapse; }
+  thead th{
+    text-align:left;
+    font-size:10.8px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    font-weight:600;
+    padding:9px 12px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:13px 12px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+    font-size:13px;
+  }
+  tbody tr{ transition:background .12s; }
+  tbody tr:hover{ background:#FAFAFC; }
+  tbody tr:last-child td{ border-bottom:none; }
+  .cell-source{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.3px;
+    color:var(--brass-dark);
+    white-space:nowrap;
+    font-weight:600;
+  }
+  .cell-heading{ font-weight:600; max-width:230px; }
+  .cell-summary{ color:var(--muted); max-width:330px; line-height:1.5; }
+  .drive-status{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:11.5px;
+    font-weight:500;
+    padding:4px 9px;
+    border-radius:20px;
+    white-space:nowrap;
+  }
+  .drive-status.up{ background:var(--ok-soft); color:var(--ok); }
+  .drive-status.pending{ background:#F0F1F5; color:var(--muted); }
+  .drive-status svg{ width:11px;height:11px; }
+
+  .stamp{
+    display:inline-flex;
+    align-items:center;
+    gap:3px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    letter-spacing:0.04em;
+    color:var(--ok);
+    background:var(--ok-soft);
+    border-radius:4px;
+    padding:2px 6px;
+    margin-left:7px;
+    font-weight:600;
+  }
+  .stamp svg{ width:9px;height:9px; }
+
+  .empty-state{
+    text-align:center;
+    padding:44px 20px 30px;
+    color:var(--muted);
+  }
+  .empty-state .icon-circle{
+    width:52px;height:52px;
+    border-radius:50%;
+    background:var(--bg);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 14px;
+  }
+  .empty-state p{ margin:0; font-size:13.5px; font-weight:600; color:var(--ink); }
+  .empty-state .sub{ font-size:12px; margin-top:4px; color:var(--muted); }
+
+  .footer-note{
+    font-size:11.5px;
+    color:var(--muted);
+    text-align:center;
+    padding:6px 0 0;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="seal-mark">
+        <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#1D2338"/>
+              <stop offset="1" stop-color="#121625"/>
+            </linearGradient>
+            <linearGradient id="brassGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#E0B563"/>
+              <stop offset="0.55" stop-color="#B8842E"/>
+              <stop offset="1" stop-color="#8F6620"/>
+            </linearGradient>
+            <linearGradient id="brassRing" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#F0CE8C"/>
+              <stop offset="1" stop-color="#B8842E"/>
+            </linearGradient>
+          </defs>
+          <rect width="128" height="128" rx="26" fill="url(#bgGrad)"/>
+          <g transform="translate(64,60)">
+            <circle r="38" fill="none" stroke="url(#brassRing)" stroke-width="2.5" opacity="0.55"/>
+            <g stroke="url(#brassRing)" stroke-width="2.5" stroke-linecap="round" opacity="0.75">
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(0)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(30)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(60)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(90)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(120)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(150)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(180)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(210)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(240)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(270)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(300)"/>
+              <line x1="0" y1="-38" x2="0" y2="-33" transform="rotate(330)"/>
+            </g>
+            <circle r="29" fill="url(#brassGrad)"/>
+            <g>
+              <rect x="-14" y="-19" width="28" height="34" rx="3" fill="#1B1204" opacity="0.92"/>
+              <rect x="-9" y="-11" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+              <rect x="-9" y="-4" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+              <rect x="-9" y="3" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+              <rect x="-9" y="10" width="11" height="3" rx="1.5" fill="url(#brassGrad)"/>
+            </g>
+          </g>
+          <g transform="translate(93,90)">
+            <circle r="15.5" fill="#121625"/>
+            <circle r="15.5" fill="none" stroke="url(#brassRing)" stroke-width="2"/>
+            <path d="M-6.5 0.5 L-2 5 L7 -5.5" fill="none" stroke="url(#brassRing)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Regulatory Monitor</h1>
+        <p>14 sources tracked</p>
+      </div>
+    </div>
+
+    <p class="side-section-label">Run configuration</p>
+    <div class="datepick" id="datePick" data-value="">
+      <button type="button" class="dp-trigger" id="dpTrigger" aria-haspopup="dialog" aria-expanded="false">
+        <svg class="dp-cal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+        <span id="dpLabel">09-07-2026</span>
+        <svg class="dp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="dp-pop" id="dpPop" role="dialog" aria-label="Choose date" hidden>
+        <div class="dp-head">
+          <button type="button" class="dp-nav" id="dpPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <span class="dp-title" id="dpTitle">July 2026</span>
+          <button type="button" class="dp-nav" id="dpNext" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+        <div class="dp-dow" id="dpDow"></div>
+        <div class="dp-days" id="dpDays"></div>
+        <div class="dp-foot">
+          <button type="button" class="dp-link" id="dpClear">Clear</button>
+          <button type="button" class="dp-link dp-link-accent" id="dpToday">Today</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="source-group">
+      <p class="source-group-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+        FEMA / RBI
+      </p>
+      <div class="source-row"><input type="checkbox" id="s1" data-remark="FEMA Notifications"><label for="s1">FEMA Notifications</label></div>
+      <div class="source-row"><input type="checkbox" id="s2" data-remark="FEMA Master Directions"><label for="s2">FEMA Master Directions</label></div>
+      <div class="source-row"><input type="checkbox" id="s3" data-remark="FEMA Master Circulars"><label for="s3">FEMA Master Circulars</label></div>
+      <div class="source-row"><input type="checkbox" id="s4" data-remark="FEMA Press Release"><label for="s4">FEMA Press Release</label></div>
+    </div>
+
+    <div class="source-group">
+      <p class="source-group-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+        MCA
+      </p>
+      <div class="source-row"><input type="checkbox" id="s5" data-remark="MCA Latest News and Important Updates Link"><label for="s5">Latest News &amp; Updates</label></div>
+      <div class="source-row"><input type="checkbox" id="s6" data-remark="MCA Whats New Tab Link"><label for="s6">What's New Tab</label></div>
+    </div>
+
+    <div class="source-group">
+      <p class="source-group-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 7l7-4 7 4M4 7h6l-3 7a3.2 3.2 0 0 0 6 0l-3-7M14 7h6l-3 7a3.2 3.2 0 0 0 6 0l-3-7"/></svg>
+        SEBI
+      </p>
+      <div class="source-row"><input type="checkbox" id="s7" data-remark="SEBI website (Regulations)" checked><label for="s7">Regulations</label></div>
+      <div class="source-row"><input type="checkbox" id="s8" data-remark="SEBI website (Rules)" checked><label for="s8">Rules</label></div>
+      <div class="source-row"><input type="checkbox" id="s9" data-remark="SEBI website (Master Circular)"><label for="s9">Master Circular</label></div>
+      <div class="source-row"><input type="checkbox" id="s10" data-remark="SEBI website (Guidelines)"><label for="s10">Guidelines</label></div>
+      <div class="source-row"><input type="checkbox" id="s11" data-remark="SEBI website (Gazette Notifications)"><label for="s11">Gazette Notifications</label></div>
+    </div>
+
+    <div class="source-group">
+      <p class="source-group-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        Other
+      </p>
+      <div class="source-row"><input type="checkbox" id="s12" data-remark="NOC under Regulation 37 Updates"><label for="s12">NOC — Regulation 37</label></div>
+      <div class="source-row"><input type="checkbox" id="s13" data-remark="Website of ITAT Bar Mumbai"><label for="s13">ITAT Bar Mumbai</label></div>
+      <div class="source-row"><input type="checkbox" id="s14" data-remark="RFPs" checked><label for="s14">DIPAM RFPs</label></div>
+    </div>
+
+    <hr class="side-div">
+
+    <div class="toggle-row">
+      <div><div class="t-label">Upload Drive</div><div class="t-sub">Push matched PDFs to Drive</div></div>
+      <label class="switch"><input type="checkbox" id="tDrive" checked><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div><div class="t-label">Hostinger Draft</div><div class="t-sub">Save to webmail drafts</div></div>
+      <label class="switch"><input type="checkbox" id="tDraft" checked><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <div><div class="t-label">Send Email</div><div class="t-sub">Send via Hostinger SMTP</div></div>
+      <label class="switch danger"><input type="checkbox" id="tSend"><span class="slider"></span></label>
+    </div>
+
+    <div class="safety-note">Send Email stays off by default. Review the draft and Drive links first, then enable it when ready to send.</div>
+
+    <div class="side-actions">
+      <button type="button" class="btn btn-secondary" id="runSelected">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>
+        Run Selected
+      </button>
+      <button type="button" class="btn btn-primary" id="runAll">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        Run All Today
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= MAIN ================= -->
+  <main class="main">
+
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn sidebar-toggle" id="sidebarToggle" title="Toggle sidebar" aria-label="Toggle sidebar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <h2>Dashboard</h2>
+          <div class="sub">Daily circular &amp; notification tracker</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn bell-btn" id="bellBtn" title="Pending review">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="bell-badge" id="bellBadge" hidden>0</span>
+        </button>
+        <a class="history-btn" href="/history-page" title="View article history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
+          History
+        </a>
+        <div class="date-chip" id="dateChip">09-07-2026</div>
+        <div class="icon-btn" id="refreshBtn" title="Refresh">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="counters">
+      <div class="counter c-matched">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+        <div><div class="num" id="cMatched">0</div><div class="lbl">Matched</div></div>
+      </div>
+      <div class="counter c-drive">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 18a4 4 0 0 1-1-7.9 5 5 0 0 1 9.6-2A4.5 4.5 0 0 1 17 18H7z"/></svg></div>
+        <div><div class="num" id="cDrive">0</div><div class="lbl">Drive Uploaded</div></div>
+      </div>
+      <div class="counter c-draft">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 6l8 6 8-6"/></svg></div>
+        <div><div class="num" id="cDraft">0</div><div class="lbl">Draft Saved</div></div>
+      </div>
+      <div class="counter c-sent">
+        <div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg></div>
+        <div><div class="num" id="cSent">0</div><div class="lbl">Email Sent</div></div>
+      </div>
+    </div>
+
+    <div class="panel notif-panel" id="notifPanel">
+      <div class="notif-head">
+        <h3>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          Pending Review
+          <span class="notif-count" id="notifCount" hidden>0</span>
+        </h3>
+        <div class="notif-head-actions">
+          <button type="button" class="btn-check" id="buildEmail" title="Build one combined email from all accepted articles">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 6l8 6 8-6"/></svg>
+            Build all accepted
+          </button>
+          <button type="button" class="btn-check" id="checkNow" title="Check sources now">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+            Check now
+          </button>
+        </div>
+      </div>
+      <div class="notif-list" id="notifList"></div>
+      <div class="notif-empty" id="notifEmpty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 6 9 17l-5-5"/></svg>
+        Nothing waiting for review. New articles will appear here.
+      </div>
+    </div>
+
+    <div class="panel results-panel">
+      <div class="results-head">
+        <h3><span class="pulse-dot" id="liveDot"></span>Live Run Log</h3>
+        <span class="run-tag" id="runTag">no run yet</span>
+      </div>
+      <div class="log" id="log"><span class="log-empty">Waiting for a run — select sources and press Run Selected or Run All Today.</span></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Source</th><th>Heading</th><th>Summary</th><th>Drive</th></tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <div class="icon-circle">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#67707F" stroke-width="1.6"><path d="M9 12h6M9 16h6M9 8h6M5 4h14v16H5z"/></svg>
+        </div>
+        <p>No documents checked yet</p>
+        <div class="sub">Run a source to see matched circulars, notifications and RFPs here.</div>
+      </div>
+    </div>
+
+    <div class="footer-note">Local run · results are saved under data/2026/July 2026/09-07-2026/</div>
+  </main>
+</div>
+
+<script>
+const logEl = document.getElementById('log');
+const bodyEl = document.getElementById('resultsBody');
+const emptyState = document.getElementById('emptyState');
+const runTag = document.getElementById('runTag');
+const liveDot = document.getElementById('liveDot');
+const cMatched = document.getElementById('cMatched');
+const cDrive = document.getElementById('cDrive');
+const cDraft = document.getElementById('cDraft');
+const cSent = document.getElementById('cSent');
+
+const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>';
+
+function logLine(text, cls){
+  const line = document.createElement('div');
+  if(cls) line.className = cls;
+  line.textContent = "› " + text;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+function escHtml(v){
+  return String(v ?? '')
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'",'&#039;');
+}
+
+function appendResultRow(article){
+  if(bodyEl.querySelector('.empty-row')) bodyEl.innerHTML = '';
+  const drive = article.drive_pdf_url
+    ? `<a class="drive-status up" href="${escHtml(article.drive_pdf_url)}" target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Uploaded</a>`
+    : '<span class="drive-status pending">— Skipped</span>';
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="cell-source">${escHtml(article.site_remark)}</td>
+    <td class="cell-heading">${escHtml(article.title)}<span class="stamp">${checkIcon}CHECKED</span></td>
+    <td class="cell-summary">${escHtml(article.summary || '')}</td>
+    <td>${drive}</td>`;
+  bodyEl.appendChild(tr);
+}
+
+const runBtnAll = document.getElementById('runAll');
+const runBtnSel = document.getElementById('runSelected');
+
+function selectedRemarks(){
+  return Array.from(document.querySelectorAll('.source-row input[type="checkbox"]:checked'))
+    .map(cb => cb.dataset.remark)
+    .filter(Boolean);
+}
+
+async function runReal(label, sources){
+  logEl.innerHTML = '';
+  bodyEl.innerHTML = '';
+  emptyState.style.display = 'none';
+  runTag.textContent = label + ' in progress…';
+  liveDot.classList.add('live');
+  cMatched.textContent = '0'; cDrive.textContent = '0'; cDraft.textContent = '0'; cSent.textContent = '0';
+  runBtnAll.disabled = true; runBtnSel.disabled = true;
+
+  const payload = {
+    run_date: document.getElementById('datePick').dataset.value || null,
+    site_filters: sources,
+    upload_drive: document.getElementById('tDrive').checked,
+    save_webmail_draft: document.getElementById('tDraft').checked,
+    send_email: document.getElementById('tSend').checked,
+  };
+
+  let matched = 0, drive = 0;
+  function handle(ev){
+    if(ev.type === 'start'){ logLine(`Checking ${ev.site_count} source(s)…`); return; }
+    if(ev.type === 'source' && ev.status === 'checking'){ logLine(`Checking ${ev.remark}…`); return; }
+    if(ev.type === 'source' && ev.status === 'matched'){ logLine(`${ev.remark}: ${ev.count} matching document(s).`, 'brass-line'); return; }
+    if(ev.type === 'document' && ev.status === 'downloading'){ logLine(`Downloading ${ev.index}/${ev.total}: ${ev.title}`); return; }
+    if(ev.type === 'document' && ev.status === 'processing'){ logLine(`Extracting ${ev.index}/${ev.total}: ${ev.title}`); return; }
+    if(ev.type === 'article'){
+      matched = ev.count; cMatched.textContent = String(matched);
+      appendResultRow(ev.article);
+      if(ev.article.drive_pdf_url){ drive += 1; cDrive.textContent = String(drive); }
+      logLine(ev.article.title, 'ok-line');
+      return;
+    }
+    if(ev.type === 'error'){ logLine(ev.message); return; }
+    if(ev.type === 'done'){
+      cMatched.textContent = String(ev.articles_found);
+      cDraft.textContent = (ev.webmail_draft_saved || ev.draft_path) ? '1' : '0';
+      cSent.textContent = ev.email_sent ? '1' : '0';
+      logLine(ev.message, ev.articles_found ? 'ok-line' : '');
+      runTag.textContent = label + ' · completed';
+      liveDot.classList.remove('live');
+      if(!ev.articles_found){ emptyState.style.display = 'block'; }
+    }
+  }
+
+  logLine('Starting ' + label.toLowerCase() + '…');
+  try {
+    const res = await fetch('/tasks/daily-run-stream', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    });
+    if(!res.ok){ throw new Error((await res.text()) || ('Request failed ' + res.status)); }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+    while(true){
+      const { value, done } = await reader.read();
+      if(done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop() || '';
+      for(const line of lines){ if(line.trim()) handle(JSON.parse(line)); }
+    }
+    if(buf.trim()) handle(JSON.parse(buf));
+  } catch (e){
+    logLine('Run failed: ' + e.message);
+    runTag.textContent = label + ' · failed';
+    liveDot.classList.remove('live');
+    if(!bodyEl.children.length) emptyState.style.display = 'block';
+  } finally {
+    runBtnAll.disabled = false; runBtnSel.disabled = false;
+  }
+}
+
+runBtnAll.addEventListener('click', () => runReal('Run All Today', []));
+runBtnSel.addEventListener('click', () => {
+  const sources = selectedRemarks();
+  if(!sources.length){ logLine('Select at least one source first.'); return; }
+  runReal('Run Selected', sources);
+});
+document.getElementById('refreshBtn').addEventListener('click', function(){
+  this.classList.add('spinning');
+  setTimeout(() => this.classList.remove('spinning'), 700);
+});
+
+const shellEl = document.querySelector('.shell');
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+  shellEl.classList.toggle('sidebar-collapsed');
+});
+
+/* ===== Pending review (notifications) ===== */
+(function(){
+  const listEl = document.getElementById('notifList');
+  const emptyEl = document.getElementById('notifEmpty');
+  const countEl = document.getElementById('notifCount');
+  const badgeEl = document.getElementById('bellBadge');
+  const checkBtn = document.getElementById('checkNow');
+  const bellBtn = document.getElementById('bellBtn');
+  const panel = document.getElementById('notifPanel');
+
+  function esc(v){
+    return String(v ?? '')
+      .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+      .replaceAll('"','&quot;').replaceAll("'",'&#039;');
+  }
+  function fmtDate(v){ if(!v) return ''; const [y,m,d] = v.split('-'); return `${d}-${m}-${y}`; }
+  function selectedDate(){ return document.getElementById('datePick').dataset.value || ''; }
+
+  function setCount(n){
+    if(n > 0){
+      countEl.textContent = n; countEl.hidden = false;
+      badgeEl.textContent = n > 99 ? '99+' : n; badgeEl.hidden = false;
+    } else {
+      countEl.hidden = true; badgeEl.hidden = true;
+    }
+  }
+
+  function render(items){
+    setCount(items.length);
+    emptyEl.style.display = items.length ? 'none' : 'flex';
+    listEl.innerHTML = items.map(it => {
+      const meta = [it.published_date ? 'Published ' + fmtDate(it.published_date) : 'Run ' + fmtDate(it.run_date)];
+      const link = it.source_url ? `· <a href="${esc(it.source_url)}" target="_blank" rel="noreferrer">source</a>` : '';
+      return `
+        <div class="notif-item" data-id="${esc(it.id)}">
+          <div class="notif-main">
+            <div class="notif-src">${esc(it.site_remark)}</div>
+            <div class="notif-title">${esc(it.title)}</div>
+            <div class="notif-meta">${esc(meta.join(''))} ${link}</div>
+          </div>
+          <div class="notif-actions">
+            <button class="btn-accept" data-act="accept" data-id="${esc(it.id)}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>Accept
+            </button>
+            <button class="btn-deny" data-act="deny" data-id="${esc(it.id)}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18M6 6l12 12"/></svg>Deny
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  async function load(){
+    try {
+      const res = await fetch('/pending');
+      if(!res.ok) throw new Error('pending ' + res.status);
+      render(await res.json());
+    } catch (e){
+      emptyEl.style.display = 'flex';
+      emptyEl.textContent = 'Could not load pending items (' + e.message + ').';
+    }
+  }
+
+  async function decide(id, act){
+    const row = listEl.querySelector(`.notif-item[data-id="${CSS.escape(id)}"]`);
+    if(row) row.classList.add('busy');
+    try {
+      const res = await fetch(`/pending/${encodeURIComponent(id)}/${act}`, { method:'POST' });
+      const data = await res.json().catch(() => ({}));
+      if(!res.ok || data.ok === false) throw new Error(data.error || ('request ' + res.status));
+      if(typeof logLine === 'function'){
+        logLine(data.message || (act === 'accept' ? 'Accepted.' : 'Denied.'), act === 'accept' ? 'ok-line' : '');
+      }
+      await load();
+    } catch (e){
+      if(row) row.classList.remove('busy');
+      if(typeof logLine === 'function') logLine('Action failed: ' + e.message, '');
+      else alert('Action failed: ' + e.message);
+    }
+  }
+
+  listEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-act]');
+    if(!btn) return;
+    decide(btn.dataset.id, btn.dataset.act);
+  });
+
+  checkBtn.addEventListener('click', async () => {
+    checkBtn.classList.add('spinning');
+    try {
+      const body = { run_date: selectedDate() || null, site_filters: [] };
+      const res = await fetch('/pending/refresh', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if(typeof logLine === 'function'){
+        logLine(`Check complete: ${data.added ?? 0} new, ${data.discovered ?? 0} found.`, 'brass-line');
+      }
+      await load();
+    } catch (e){
+      if(typeof logLine === 'function') logLine('Check failed: ' + e.message, '');
+    } finally {
+      setTimeout(() => checkBtn.classList.remove('spinning'), 700);
+    }
+  });
+
+  const buildBtn = document.getElementById('buildEmail');
+  buildBtn.addEventListener('click', async () => {
+    buildBtn.classList.add('spinning');
+    buildBtn.disabled = true;
+    try {
+      const body = { site_filters: [] };
+      const res = await fetch('/pending/build-email', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      const msg = (data.ok === false) ? (data.error || 'Build failed.') : (data.message || 'Email draft built.');
+      if(typeof logLine === 'function') logLine(msg, data.ok === false ? '' : 'brass-line');
+      if(data.ok === false){
+        runTag.textContent = 'Build all accepted · no draft';
+      } else {
+        runTag.textContent = 'Build all accepted · completed';
+        if(data.draft_path || data.webmail_draft_saved) cDraft.textContent = '1';
+        emptyState.style.display = 'none';
+        if(data.draft_path && typeof logLine === 'function') logLine('Local draft: ' + data.draft_path, 'ok-line');
+        if(data.webmail_draft_saved && typeof logLine === 'function') logLine('Hostinger Drafts: saved successfully.', 'ok-line');
+        if(data.webmail_draft_error && typeof logLine === 'function') logLine('Hostinger Drafts failed: ' + data.webmail_draft_error, '');
+      }
+    } catch (e){
+      if(typeof logLine === 'function') logLine('Build email failed: ' + e.message, '');
+        runTag.textContent = 'Build all accepted · failed';
+    } finally {
+      buildBtn.disabled = false;
+      setTimeout(() => buildBtn.classList.remove('spinning'), 700);
+    }
+  });
+
+  bellBtn.addEventListener('click', () => panel.scrollIntoView({ behavior:'smooth', block:'start' }));
+  document.getElementById('refreshBtn').addEventListener('click', async () => {
+    if(typeof logLine === 'function') logLine('Refreshing pending review list...');
+    await load();
+  });
+
+  load();
+})();
+
+/* ===== Custom date picker ===== */
+(function(){
+  const root = document.getElementById('datePick');
+  const trigger = document.getElementById('dpTrigger');
+  const pop = document.getElementById('dpPop');
+  const label = document.getElementById('dpLabel');
+  const title = document.getElementById('dpTitle');
+  const dow = document.getElementById('dpDow');
+  const days = document.getElementById('dpDays');
+  const dateChip = document.getElementById('dateChip');
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DOW = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+  dow.innerHTML = DOW.map(d => `<span>${d}</span>`).join('');
+
+  let selected = parseISO(root.dataset.value) || new Date(); // default to today
+  selected.setHours(0,0,0,0);
+  let view = new Date(selected); // month being shown
+
+  function parseISO(v){
+    if(!v) return null;
+    const [y,m,d] = v.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function fmtLabel(dt){ return dt ? `${pad(dt.getDate())}-${pad(dt.getMonth()+1)}-${dt.getFullYear()}` : 'Select date'; }
+  function sameDay(a,b){ return a && b && a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+  function render(){
+    title.textContent = `${MONTHS[view.getMonth()]} ${view.getFullYear()}`;
+    const year = view.getFullYear(), month = view.getMonth();
+    const first = new Date(year, month, 1);
+    const start = first.getDay();
+    const today = new Date();
+    const cells = [];
+    for(let i = 0; i < 42; i++){
+      const dt = new Date(year, month, 1 - start + i);
+      const muted = dt.getMonth() !== month;
+      const cls = ['dp-day'];
+      if(muted) cls.push('muted');
+      if(sameDay(dt, today)) cls.push('today');
+      if(sameDay(dt, selected)) cls.push('selected');
+      cells.push(`<div class="${cls.join(' ')}" data-iso="${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}">${dt.getDate()}</div>`);
+    }
+    days.innerHTML = cells.join('');
+  }
+
+  function syncLabels(){
+    label.textContent = fmtLabel(selected);
+    if(dateChip && selected) dateChip.textContent = fmtLabel(selected);
+    root.dataset.value = selected ? `${selected.getFullYear()}-${pad(selected.getMonth()+1)}-${pad(selected.getDate())}` : '';
+  }
+
+  function open(){ pop.hidden = false; trigger.setAttribute('aria-expanded','true'); render(); }
+  function close(){ pop.hidden = true; trigger.setAttribute('aria-expanded','false'); }
+
+  trigger.addEventListener('click', (e) => { e.stopPropagation(); pop.hidden ? open() : close(); });
+  document.getElementById('dpPrev').addEventListener('click', () => { view.setMonth(view.getMonth()-1); render(); });
+  document.getElementById('dpNext').addEventListener('click', () => { view.setMonth(view.getMonth()+1); render(); });
+  document.getElementById('dpClear').addEventListener('click', () => { selected = null; syncLabels(); render(); });
+  document.getElementById('dpToday').addEventListener('click', () => {
+    selected = new Date(); selected.setHours(0,0,0,0);
+    view = new Date(selected); syncLabels(); render(); close();
+  });
+  days.addEventListener('click', (e) => {
+    const cell = e.target.closest('.dp-day');
+    if(!cell) return;
+    selected = parseISO(cell.dataset.iso);
+    view = new Date(selected);
+    syncLabels(); render(); close();
+  });
+  pop.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => { if(!pop.hidden) close(); });
+  document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && !pop.hidden) close(); });
+
+  syncLabels();
+})();
+</script>
+</body>
+</html>

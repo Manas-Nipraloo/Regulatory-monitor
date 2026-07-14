@@ -1,0 +1,130 @@
+﻿Regulatory Monitor - Session Summary
+Date: 06-07-2026
+
+Project Goal
+- Build a Python/FastAPI regulatory monitor app.
+- Daily workflow:
+  1. Visit configured regulatory websites.
+  2. Find current-date articles/documents.
+  3. Download/process PDF documents.
+  4. Upload only PDFs to Google Drive in date/remark folders.
+  5. Extract headings and summaries.
+  6. Draft an email in the required format.
+  7. If no articles are found, do not upload anything and do not create an email draft.
+
+App Created
+- FastAPI app created and running on: http://127.0.0.1:8000
+- Main endpoint: POST /tasks/daily-run
+- Health endpoint: GET /health
+
+Important Files
+- app/main.py: FastAPI entrypoint.
+- app/tasks/daily_monitor.py: Main daily workflow.
+- app/services/site_registry.py: Site registry and dispatch.
+- app/services/scrapers/bse_noc_under.py: BSE NOC under Regulation 37 scraper.
+- app/services/pdf_extractor.py: PDF heading/summary extraction.
+- app/services/groq_extractor.py: Groq vision fallback for scanned PDFs.
+- app/services/google_workspace.py: Google Drive/Sheets integration.
+- app/services/email_draft.py: Email body/draft builder.
+- app/services/gmail_draft.py: Gmail draft skeleton for later.
+- config/credentials/google_oauth_credentials.json: OAuth credentials file for Drive upload as your Google account.
+- config/credentials/email_draft_credentials.json: Email draft credentials placeholder.
+
+BSE Site Added and Tested
+- Site: https://www.bseindia.com/corporates/NOCUnder.aspx
+- Remark/folder name: NOC under Regulation 37 Updates
+- Test date: 03-07-2026
+- BSE API found 1 row for Persistent Systems Limited.
+- BSE download was a ZIP file.
+- App now extracts only PDFs from ZIPs and ignores ZIP upload.
+- Extracted PDFs:
+  1. Board Resolution - Media Agility India Pvt. Ltd..pdf
+  2. Board Resolution - Persistent Systems Limited.pdf
+  3. Scheme of Amalgamtion - Persistent Systems.pdf
+
+Drive Upload Rules Updated
+- Old local PDF/ZIP storage behavior was removed for future runs.
+- Future runs process PDFs in memory.
+- ZIP files are not uploaded.
+- Only PDFs are uploaded to Drive.
+- If no article is found, no Drive folder/upload and no email draft is created.
+- Local data folder should mainly contain email drafts until Drive/Gmail setup is complete.
+
+Email Draft Format
+- Email format changed to match provided screenshot:
+  Subject: Kindly find the New Circulars and updated Drive link
+  Body includes:
+  - Dear Team,
+  - Greetings to all.
+  - Kindly find the New Circulars and updated Drive link
+  - Date : DD-MM-YYYY
+  - Numbered remark sections
+  - URL
+  - Heading
+  - Summary
+  - Best regards
+  - Manas Aher
+  - Junior Web Developer
+- Current local draft example:
+  data/2026/July 2026/03-07-2026/email-drafts/03-07-2026.eml
+
+Groq AI Added
+- Groq key was placed in .env.
+- PyMuPDF installed to render scanned PDF pages as images.
+- If pypdf cannot extract text, app sends rendered PDF pages to Groq.
+- Groq successfully generated summaries for scanned BSE PDFs.
+- Security note: Groq key was pasted in chat; rotate later if needed.
+
+Google Drive Authentication Work
+- First tried service account JSON.
+- Service account file was valid:
+  regulatory-monitor-drive@regulatory-monitor-499906.iam.gserviceaccount.com
+- Drive folder was visible but not editable by the service account.
+- Upload failed because service account did not have Editor permission.
+- Decided to use Option 2: OAuth upload as your own Google account instead.
+
+OAuth Setup Progress
+- OAuth Desktop client exists in Google Cloud: Regulatory Monitor.
+- Client ID and new client secret were added into:
+  config/credentials/google_oauth_credentials.json
+- Added OAuth helper script:
+  tools/google_oauth_login.py
+- Helper generates login URL into:
+  config/credentials/google_oauth_login_url.txt
+- Login flow reached Google 2-step verification/authenticator step.
+- Setup paused before refresh token was saved.
+- OAuth helper process was stopped.
+
+Current OAuth Status
+- client_id: present
+- client_secret: present
+- refresh_token: not completed yet
+- Next time, run:
+  python -B tools\google_oauth_login.py
+- Then open:
+  config/credentials/google_oauth_login_url.txt
+- Paste the full URL into the browser address bar.
+- Complete Google login and authenticator code.
+- After success, refresh_token should be saved automatically.
+
+Credentials/Secrets Handling
+- .gitignore added for:
+  .env
+  config/credentials/google_service_account.json
+  config/credentials/google_oauth_credentials.json
+  config/credentials/email_draft_credentials.json
+  data/
+  __pycache__/
+- Do not commit credentials.
+
+What To Do Next
+1. Finish OAuth login later to save refresh_token.
+2. Test Drive upload for BSE 03-07-2026.
+3. Confirm Drive folder structure is correct:
+   2026 / July 2026 / 03-07-2026 / NOC under Regulation 37 Updates / PDFs
+4. Add Gmail draft credentials later.
+5. Add more sites one by one and test each site by date.
+
+Notes
+- The FastAPI server may still be running in the background from earlier.
+- OAuth helper was stopped when we paused.
