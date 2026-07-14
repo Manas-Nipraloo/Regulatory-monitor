@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     email_signature_title: str = "Junior Web Developer"
     groq_api_key: str = ""
     groq_model: str = "meta-llama/llama-4-scout-17b-16e-instruct"
-    groq_max_pdf_pages: int = 3
+    groq_max_pdf_pages: int = 5
     email_credentials_file: Path = Path("config/credentials/email_draft_credentials.json")
     supabase_url: str = ""
     supabase_key: str = ""

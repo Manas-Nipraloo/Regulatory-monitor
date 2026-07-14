@@ -250,9 +250,14 @@ async def accept_pending(pending_id: str) -> dict:
     }
 
 
-def build_email_for_date(run_date: date | None = None) -> dict:
+def build_email_for_date(
+    run_date: date | None = None, site_filters: list[str] | None = None
+) -> dict:
     """Build one combined email draft from every currently accepted article."""
-    items = pending_store.list_accepted()
+    items = pending_store.list_accepted(run_date)
+    if site_filters:
+        allowed = {site.casefold() for site in site_filters}
+        items = [item for item in items if item.site_remark.casefold() in allowed]
     if not items:
         return {"ok": False, "error": "No accepted articles are available yet."}
 

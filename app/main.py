@@ -262,7 +262,10 @@ def pending_deny(pending_id: str) -> dict[str, object]:
 @app.post("/pending/build-email")
 def pending_build_email(request: DailyRunRequest) -> dict[str, object]:
     try:
-        return build_email_for_date()
+        return build_email_for_date(
+            run_date=request.run_date,
+            site_filters=request.site_filters or None,
+        )
     except Exception as exc:
         return {"ok": False, "error": f"Build email failed: {exc}"}
 

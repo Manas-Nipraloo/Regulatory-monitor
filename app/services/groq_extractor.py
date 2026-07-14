@@ -9,7 +9,7 @@ from app.config import get_settings
 
 
 GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions"
-MAX_TEXT_CHARS = 18000
+MAX_TEXT_CHARS = 36000
 
 
 def extract_text_pdf_with_groq(filename: str, text: str) -> tuple[str, str] | None:
@@ -21,10 +21,11 @@ def extract_text_pdf_with_groq(filename: str, text: str) -> tuple[str, str] | No
     if not cleaned_text:
         return None
 
+    sampled_text = _sample_pdf_text(cleaned_text, MAX_TEXT_CHARS)
     content_parts: list[dict[str, object]] = [
         {
             "type": "text",
-            "text": f"{_prompt(filename)}\n\nPDF text:\n{cleaned_text[:MAX_TEXT_CHARS]}",
+            "text": f"{_prompt(filename)}\n\nPDF text:\n{sampled_text}",
         }
     ]
     return _request_groq(content_parts)
@@ -35,13 +36,13 @@ def extract_scanned_pdf_with_groq(filename: str, content: bytes) -> tuple[str, s
     if not settings.groq_api_key:
         return None
 
-    first_page_urls = _render_pdf_pages(content, max_pages=1)
-    if first_page_urls:
-        result = _request_groq(_vision_content_parts(filename, first_page_urls))
+    preview_urls = _render_pdf_pages(content, max_pages=2)
+    if preview_urls:
+        result = _request_groq(_vision_content_parts(filename, preview_urls))
         if result:
             return result
 
-    image_urls = _render_pdf_pages(content, max_pages=max(settings.groq_max_pdf_pages, 6))
+    image_urls = _render_pdf_pages(content, max_pages=max(settings.groq_max_pdf_pages, 5))
     if not image_urls:
         return None
 
@@ -93,7 +94,11 @@ def _prompt(filename: str) -> str:
         "or extra paragraphs. If the PDF page is an image or scan, perform OCR from the "
         "rendered page image first, ignore visual noise, and infer the document title from "
         "the readable content. Focus on the main regulatory action, parties involved, and "
-        f"effective date if present. Filename: {filename}"
+        f"effective date if present. Ignore page furniture like annexure numbers, company "
+        "addresses, CIN/registered office blocks, repeated headers/footers, and tables of "
+        "contact details unless they are the main subject of the document. If the page says "
+        "'Annexure' or similar, use the actual document subject as the summary rather than "
+        f"just repeating the annexure label. Filename: {filename}"
     )
 
 
@@ -110,6 +115,21 @@ def _clean_summary(value: str) -> str:
     if sentence_match:
         return sentence_match.group(1).strip()
     return shortened
+
+
+def _sample_pdf_text(text: str, max_chars: int) -> str:
+    if len(text) <= max_chars:
+        return text
+
+    window = max_chars // 3
+    head = text[:window].rstrip()
+    middle_start = max((len(text) // 2) - (window // 2), 0)
+    middle = text[middle_start : middle_start + window].strip()
+    tail = text[-window:].lstrip()
+    return (
+        f"{head}\n\n[... middle of document ...]\n\n"
+        f"{middle}\n\n[... end of document ...]\n\n{tail}"
+    )
 
 
 def _render_pdf_pages(content: bytes, max_pages: int) -> list[str]:

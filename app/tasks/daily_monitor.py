@@ -195,23 +195,22 @@ def _article_from_pdf(
         drive_pdf_url=drive_pdf_url,
         drive_folder_url=drive_folder_url,
         metadata_path=None,
-        summary=_email_summary(item, metadata.summary),
+        summary=_email_summary(item, pdf_name, metadata.summary),
     )
 
 
 def _email_title(item: DiscoveredArticle, pdf_name: str, extracted_heading: str) -> str:
-    if "master circulars" in item.site.remark.casefold() and item.title:
-        return item.title
-    if _bad_extracted_heading(extracted_heading, pdf_name) and item.title:
-        return item.title
-    return extracted_heading or Path(pdf_name).stem or item.title
+    if not _bad_extracted_heading(extracted_heading, pdf_name):
+        return extracted_heading
+    return item.title or Path(pdf_name).stem
 
 
-def _email_summary(item: DiscoveredArticle, extracted_summary: str) -> str:
-    if _unreadable_summary(extracted_summary) and item.title:
+def _email_summary(item: DiscoveredArticle, pdf_name: str, extracted_summary: str) -> str:
+    if _unreadable_summary(extracted_summary):
         date_text = item.published_date.strftime("%B %d, %Y") if item.published_date else "the selected date"
+        pdf_title = item.title or Path(pdf_name).stem
         return (
-            f"RBI published {item.title} on {date_text}. The uploaded PDF should be reviewed for detailed clauses "
+            f"{item.site.remark} published '{pdf_title}' on {date_text}. The uploaded PDF should be reviewed for detailed clauses "
             "because the source scan was not clear enough for reliable text extraction."
         )
     return extracted_summary
