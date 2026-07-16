@@ -55,13 +55,22 @@ async def run_daily_monitor(
 
                 try:
                     content = await download_document_bytes(client, item, DOWNLOAD_HEADERS)
-                    articles.extend(_process_downloaded_item(run_date, item, content, upload_drive=upload_drive))
+                    articles.extend(
+                        _process_downloaded_item(
+                            run_date,
+                            item,
+                            content,
+                            upload_drive=upload_drive,
+                        )
+                    )
                 except Exception as exc:
                     errors.append(f"{site.remark}: {item.title} failed ({exc})")
 
     draft_path = save_daily_email_draft(run_date, articles) if articles else None
+
     webmail_draft_saved = False
     webmail_draft_error = None
+
     if articles and save_webmail_draft and imap_credentials_ready(settings.email_credentials_file):
         try:
             webmail_draft_saved = save_imap_draft(
@@ -73,6 +82,7 @@ async def run_daily_monitor(
 
     email_sent = False
     email_error = None
+
     if articles and send_email_enabled and smtp_credentials_ready(settings.email_credentials_file):
         try:
             email_sent = send_smtp_email(
@@ -83,14 +93,17 @@ async def run_daily_monitor(
             email_error = str(exc)
 
     message = "Daily run completed."
+
     if not articles:
         message = "No current-date articles found. No Drive upload or email draft was created."
     elif email_sent:
         message = "Daily run completed and email sent."
     elif email_error:
         message = f"Daily run completed, but email sending failed: {email_error}"
+
     if errors:
         message = f"{message} Issues: {'; '.join(errors[:3])}"
+
         if len(errors) > 3:
             message = f"{message}; plus {len(errors) - 3} more."
 
@@ -113,7 +126,14 @@ def _process_downloaded_item(
     content: bytes,
     upload_drive: bool = True,
 ) -> list[ArticleResult]:
-    return list(_process_downloaded_item_incremental(run_date, item, content, upload_drive=upload_drive))
+    return list(
+        _process_downloaded_item_incremental(
+            run_date,
+            item,
+            content,
+            upload_drive=upload_drive,
+        )
+    )
 
 
 def _process_downloaded_item_incremental(
@@ -125,12 +145,26 @@ def _process_downloaded_item_incremental(
     filename = item.filename or _filename_from_url(item.pdf_url) or _pdf_filename(item.title)
 
     if _looks_like_zip(filename, content):
-        yield from _process_zip_incremental(run_date, item, content, upload_drive=upload_drive)
+        yield from _process_zip_incremental(
+            run_date,
+            item,
+            content,
+            upload_drive=upload_drive,
+        )
         return
 
     if _looks_like_pdf(filename, content):
-        pdf_name = safe_folder_name(filename if filename.lower().endswith(".pdf") else _pdf_filename(item.title))
-        yield _article_from_pdf(run_date, item, pdf_name, content, upload_drive=upload_drive)
+        pdf_name = safe_folder_name(
+            filename if filename.lower().endswith(".pdf") else _pdf_filename(item.title)
+        )
+
+        yield _article_from_pdf(
+            run_date,
+            item,
+            pdf_name,
+            content,
+            upload_drive=upload_drive,
+        )
 
 
 def _process_zip(
@@ -139,7 +173,14 @@ def _process_zip(
     content: bytes,
     upload_drive: bool = True,
 ) -> list[ArticleResult]:
-    return list(_process_zip_incremental(run_date, item, content, upload_drive=upload_drive))
+    return list(
+        _process_zip_incremental(
+            run_date,
+            item,
+            content,
+            upload_drive=upload_drive,
+        )
+    )
 
 
 def _process_zip_incremental(
@@ -156,9 +197,17 @@ def _process_zip_incremental(
     for member in archive.infolist():
         if member.is_dir() or not member.filename.lower().endswith(".pdf"):
             continue
+
         pdf_name = safe_folder_name(Path(member.filename).name)
         pdf_content = archive.read(member)
-        yield _article_from_pdf(run_date, item, pdf_name, pdf_content, upload_drive=upload_drive)
+
+        yield _article_from_pdf(
+            run_date,
+            item,
+            pdf_name,
+            pdf_content,
+            upload_drive=upload_drive,
+        )
 
 
 def _article_from_pdf(
@@ -169,8 +218,10 @@ def _article_from_pdf(
     upload_drive: bool = True,
 ) -> ArticleResult:
     metadata = extract_pdf_metadata(filename=pdf_name, content=content)
+
     drive_pdf_url = None
     drive_folder_url = None
+
     if upload_drive and google_workspace_enabled():
         drive_upload = upload_pdf_bytes_to_drive(
             filename=pdf_name,
@@ -182,6 +233,7 @@ def _article_from_pdf(
             ],
             site_remark=item.site.remark,
         )
+
         drive_pdf_url = drive_upload.pdf_url
         drive_folder_url = drive_upload.folder_url
 
@@ -202,46 +254,87 @@ def _article_from_pdf(
 def _email_title(item: DiscoveredArticle, pdf_name: str, extracted_heading: str) -> str:
     if not _bad_extracted_heading(extracted_heading, pdf_name):
         return extracted_heading
+
     return item.title or Path(pdf_name).stem
 
 
 def _email_summary(item: DiscoveredArticle, pdf_name: str, extracted_summary: str) -> str:
-    if _unreadable_summary(extracted_summary):
-        date_text = item.published_date.strftime("%B %d, %Y") if item.published_date else "the selected date"
-        pdf_title = item.title or Path(pdf_name).stem
-        return (
-            f"{item.site.remark} published '{pdf_title}' on {date_text}. The uploaded PDF should be reviewed for detailed clauses "
-            "because the source scan was not clear enough for reliable text extraction."
-        )
-    return extracted_summary
+    summary = " ".join((extracted_summary or "").split()).strip()
+
+    if not summary:
+        return ""
+
+    blocked_fallbacks = (
+        "no extractable text was found in this pdf.",
+        "this scanned pdf could not be read clearly enough",
+        "please review the uploaded document",
+        "source scan was not clear enough",
+        "the uploaded pdf should be reviewed",
+        "summary could not be generated clearly from this pdf",
+    )
+
+    if any(blocked_text in summary.casefold() for blocked_text in blocked_fallbacks):
+        return ""
+
+    return summary
 
 
 def _bad_extracted_heading(heading: str, pdf_name: str) -> bool:
     cleaned = " ".join((heading or "").split()).strip()
+
     if not cleaned:
         return True
 
     filename_stem = Path(pdf_name).stem.casefold()
+
     if cleaned.casefold() == filename_stem:
         return True
 
     compact = re.sub(r"[^A-Za-z0-9]", "", cleaned)
+
     if len(compact) >= 24 and " " not in cleaned:
         alpha_num_ratio = len(compact) / max(len(cleaned), 1)
         return alpha_num_ratio > 0.85
+
     return False
+
+
+_LETTERHEAD_MARKERS = (
+    "regd. office",
+    "registered office",
+    "central office",
+    "corporate relationship dept",
+    "kind attn",
+    "cin:",
+    "cin :",
+    "website:",
+    "phone:",
+    "fax:",
+)
 
 
 def _unreadable_summary(summary: str) -> bool:
     text = " ".join((summary or "").split()).casefold()
-    return (
-        not text
-        or "could not be read clearly enough" in text
-        or text == "no extractable text was found in this pdf."
-        or text.startswith("reserve bank of india")
-        or text.startswith("rbi/")
-        or text.startswith("0 reserve bank of india")
-    )
+
+    if not text:
+        return True
+
+    if "could not be read clearly enough" in text:
+        return True
+
+    if text == "no extractable text was found in this pdf.":
+        return True
+
+    if text.startswith(("reserve bank of india", "rbi/", "0 reserve bank of india")):
+        if any(marker in text for marker in _LETTERHEAD_MARKERS):
+            return True
+
+        if len(text.split()) < 8:
+            return True
+
+        return False
+
+    return False
 
 
 def _looks_like_zip(filename: str, content: bytes) -> bool:

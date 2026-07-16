@@ -1,6 +1,7 @@
 ﻿.env
 __pycache__/
 *.pyc
+.venv/
 data/
 tools/main-bse.js
 config/credentials/email_draft_credentials.json

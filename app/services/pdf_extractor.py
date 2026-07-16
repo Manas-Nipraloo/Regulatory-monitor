@@ -1,8 +1,6 @@
 ﻿from io import BytesIO
-
 from pathlib import Path
 import re
-from io import BytesIO
 
 from pypdf import PdfReader
 
@@ -16,13 +14,26 @@ NO_EXTRACTABLE_TEXT = "No extractable text was found in this PDF."
 
 def extract_pdf_metadata(filename: str, content: bytes) -> PdfExtractionResponse:
     reader = PdfReader(BytesIO(content))
-    pages_text = [(page.extract_text() or "").strip() for page in reader.pages]
+
+    max_pages_for_summary = 6
+    pages_text = [
+        (page.extract_text() or "").strip()
+        for page in reader.pages[:max_pages_for_summary]
+    ]
+
     text = "\n\n".join(part for part in pages_text if part)
+
+    print("======================================")
+    print("PDF EXTRACTION STARTED:", filename)
+    print("PDF PAGE COUNT:", len(reader.pages))
+    print("EXTRACTED TEXT CHARS:", len(text))
+    print("VISION FIRST:", _should_use_vision_first(text))
+    print("======================================")
 
     if _should_use_vision_first(text):
         ai_result = extract_scanned_pdf_with_groq(filename, content)
-        if ai_result and _looks_noisy(*ai_result):
-            ai_result = None
+        print("AI RESULT FROM GROQ VISION:", ai_result)
+
         if ai_result:
             heading, summary = ai_result
         elif _has_meaningful_text(text):
@@ -30,32 +41,31 @@ def extract_pdf_metadata(filename: str, content: bytes) -> PdfExtractionResponse
             summary = _summarize(text)
         else:
             heading = filename.rsplit(".", 1)[0]
-            summary = NO_EXTRACTABLE_TEXT
+            summary = ""
+
     elif _has_meaningful_text(text):
         ai_result = extract_text_pdf_with_groq(filename, text)
-        if ai_result and _looks_noisy(*ai_result):
-            vision_result = extract_scanned_pdf_with_groq(filename, content)
-            if vision_result and not _looks_noisy(*vision_result):
-                ai_result = vision_result
-            else:
-                ai_result = _unreadable_result(filename)
+        print("AI RESULT FROM GROQ TEXT:", ai_result)
+
         if ai_result:
             heading, summary = ai_result
         else:
             heading = _extract_heading(text, filename)
             summary = _summarize(text)
+
     else:
         ai_result = extract_scanned_pdf_with_groq(filename, content)
-        if ai_result and _looks_noisy(*ai_result):
-            ai_result = _unreadable_result(filename)
+        print("AI RESULT FROM GROQ FALLBACK VISION:", ai_result)
+
         if ai_result:
             heading, summary = ai_result
         else:
             heading = filename.rsplit(".", 1)[0]
-            summary = NO_EXTRACTABLE_TEXT
+            summary = ""
 
-    if _looks_noisy(heading, summary):
-        heading, summary = _unreadable_result(filename)
+    print("FINAL PDF HEADING:", heading)
+    print("FINAL PDF SUMMARY:", summary)
+    print("======================================")
 
     return PdfExtractionResponse(
         filename=filename,
@@ -74,25 +84,54 @@ def _has_meaningful_text(text: str) -> bool:
 def _should_use_vision_first(text: str) -> bool:
     if not _has_meaningful_text(text):
         return True
+
     compact = " ".join(text.split())
+
     if "�" in compact or "\\n" in compact:
         return True
+
     if any(fragment in compact for fragment in ("On B }", "IEIb", "F:Jranb", "ggTgTg")):
         return True
+
     alpha = sum(1 for char in compact if char.isalpha())
     symbols = sum(1 for char in compact if not char.isalnum() and not char.isspace())
+
     if alpha and symbols / alpha > 0.45:
         return True
+
     short_words = [word for word in compact.split()[:120] if len(word) <= 2]
+
     return len(short_words) > 45
 
 
 def _extract_heading(text: str, filename: str) -> str:
     candidates = _meaningful_lines(text)
+    scored_candidates: list[tuple[int, int, str]] = []
+
+    for index, cleaned in enumerate(candidates):
+        normalized = _normalize_heading_candidate(cleaned)
+
+        if not normalized:
+            continue
+
+        score = _score_heading_candidate(normalized, index)
+
+        if score > 0:
+            scored_candidates.append((score, index, normalized))
+
+    if scored_candidates:
+        scored_candidates.sort(key=lambda item: (-item[0], item[1], len(item[2])))
+        best_score, _, best_heading = scored_candidates[0]
+
+        if best_score >= 5:
+            return best_heading[:240]
+
     for cleaned in candidates:
         lowered = cleaned.casefold()
+
         if _looks_like_heading(cleaned):
-            return cleaned[:240]
+            return _normalize_heading_candidate(cleaned)[:240]
+
         if any(
             token in lowered
             for token in (
@@ -107,76 +146,67 @@ def _extract_heading(text: str, filename: str) -> str:
                 "no-objection letter",
             )
         ):
-            return _strip_heading_prefix(cleaned)[:240]
+            return _normalize_heading_candidate(cleaned)[:240]
+
     for cleaned in candidates:
-        if len(cleaned) >= 12:
-            return cleaned[:240]
+        normalized = _normalize_heading_candidate(cleaned)
+
+        if len(normalized) >= 12:
+            return normalized[:240]
+
     return filename.rsplit(".", 1)[0]
 
 
 def _summarize(text: str) -> str:
     sentences = _meaningful_sentences(text)
+
     if not sentences:
-        return NO_EXTRACTABLE_TEXT
+        return ""
 
     max_words = min(get_settings().summary_max_words, 55)
     chosen: list[str] = []
     total_words = 0
+
     for sentence in sentences:
         words = sentence.split()
+
         if not words:
             continue
+
         if chosen and total_words + len(words) > max_words:
             break
+
         chosen.append(sentence)
         total_words += len(words)
+
         if len(chosen) >= 2:
             break
 
     summary = " ".join(chosen).strip()
+
     if summary:
         return summary[:420]
 
     words = " ".join(text.split()).split()
     shortened = " ".join(words[:max_words]).rstrip(" .,;:")
-    return shortened or NO_EXTRACTABLE_TEXT
 
-
-def _looks_noisy(heading: str, summary: str) -> bool:
-    text = f"{heading} {summary}"
-    heading_symbols = [char for char in heading if not char.isalnum() and not char.isspace()]
-    if len(heading.strip()) < 16 and heading_symbols:
-        return True
-    if "ieib" in heading.casefold():
-        return True
-    if summary.strip().startswith(("On B }", "]_&", "i)")):
-        return True
-    if "�" in text or "\\n" in text:
-        return True
-    meaningful = [char for char in text if char.isalnum() or char.isspace()]
-    if not text:
-        return True
-    return len(meaningful) / len(text) < 0.7
-
-
-def _unreadable_result(filename: str) -> tuple[str, str]:
-    heading = Path(filename).stem or "Scanned annexure"
-    summary = (
-        "This scanned PDF could not be read clearly enough to generate a reliable AI summary. "
-        "Please review the uploaded document in the Drive folder for details."
-    )
-    return heading, summary
+    return shortened or ""
 
 
 def _meaningful_lines(text: str) -> list[str]:
     lines: list[str] = []
+
     for raw_line in text.splitlines():
         cleaned = " ".join(raw_line.split()).strip(" -\t")
+
         if not cleaned or len(cleaned) < 4:
             continue
+
         if _is_boilerplate_line(cleaned) or _is_index_like_line(cleaned):
             continue
+
         lines.append(cleaned)
+
     return lines
 
 
@@ -184,28 +214,50 @@ def _meaningful_sentences(text: str) -> list[str]:
     compact = " ".join(text.split())
     raw_sentences = re.split(r"(?<=[.!?])\s+", compact)
     sentences: list[str] = []
+
     for sentence in raw_sentences:
         cleaned = sentence.strip(" -\t")
+
         if len(cleaned) < 35:
             continue
+
         if _is_boilerplate_line(cleaned) or _is_index_like_line(cleaned):
             continue
-        if any(token in cleaned.casefold() for token in ("regd. office", "registered office", "corporate relationship dept", "phone :", "website :", "cin:")):
+
+        if _score_heading_candidate(cleaned, 0) >= 8:
             continue
+
+        if any(
+            token in cleaned.casefold()
+            for token in (
+                "regd. office",
+                "registered office",
+                "corporate relationship dept",
+                "phone :",
+                "website :",
+                "cin:",
+            )
+        ):
+            continue
+
         sentences.append(cleaned)
+
     if sentences:
         return sentences
 
     for line in _meaningful_lines(text):
-        if len(line) >= 35:
+        if len(line) >= 35 and _score_heading_candidate(line, 0) < 8:
             sentences.append(line)
+
     return sentences
 
 
 def _looks_like_heading(line: str) -> bool:
     lowered = line.casefold()
+
     if _is_boilerplate_line(line):
         return False
+
     return any(
         token in lowered
         for token in (
@@ -222,14 +274,144 @@ def _looks_like_heading(line: str) -> bool:
     )
 
 
+def _normalize_heading_candidate(line: str) -> str:
+    cleaned = _strip_heading_prefix(" ".join(line.split())).strip(" -\t:;,.")
+    cleaned = re.sub(r"\s{2,}", " ", cleaned)
+
+    return cleaned
+
+
+def _score_heading_candidate(line: str, index: int) -> int:
+    cleaned = _normalize_heading_candidate(line)
+    lowered = cleaned.casefold()
+    words = cleaned.split()
+
+    if len(cleaned) < 12 or len(cleaned) > 260:
+        return -10
+
+    if len(words) < 3 or len(words) > 34:
+        return -8
+
+    if _is_boilerplate_line(cleaned) or _is_index_like_line(cleaned):
+        return -10
+
+    score = max(0, 8 - index)
+
+    if _looks_like_heading(cleaned):
+        score += 7
+
+    if _looks_like_main_heading(cleaned):
+        score += 8
+
+    uppercase_letters = sum(1 for char in cleaned if char.isalpha() and char.isupper())
+    alpha_letters = sum(1 for char in cleaned if char.isalpha())
+    uppercase_ratio = uppercase_letters / alpha_letters if alpha_letters else 0
+
+    if alpha_letters >= 18 and uppercase_ratio >= 0.72:
+        score += 4
+
+    if 4 <= len(words) <= 22:
+        score += 2
+
+    if 8 <= len(words) <= 18:
+        score += 2
+
+    keyword_hits = sum(
+        1
+        for token in (
+            "scheme",
+            "merger",
+            "amalgamation",
+            "turnover",
+            "data",
+            "circular",
+            "press release",
+            "draft scheme",
+            "complaint report",
+            "certificate",
+            "report on",
+            "observation letter",
+            "no objection",
+            "transferor company",
+            "transferee company",
+            "board of directors",
+            "consider and approve",
+        )
+        if token in lowered
+    )
+
+    score += min(keyword_hits, 4) * 2
+
+    if re.search(
+        r"\b(january|february|march|april|may|june|july|august|september|october|november|december)\b",
+        lowered,
+    ):
+        score += 2
+
+    if re.search(r"\b\d{4}\b", cleaned):
+        score += 1
+
+    if ":" in cleaned and len(words) >= 4:
+        score += 1
+
+    if "(" in cleaned and ")" in cleaned:
+        score += 1
+
+    digit_ratio = sum(1 for char in cleaned if char.isdigit()) / max(len(cleaned), 1)
+
+    if digit_ratio > 0.2:
+        score -= 3
+
+    if cleaned.endswith(":"):
+        score -= 2
+
+    if cleaned.count(",") >= 5:
+        score -= 2
+
+    if re.match(r"^(annexure|schedule|table|index)\b", lowered):
+        score -= 8
+
+    return score
+
+
+def _looks_like_main_heading(line: str) -> bool:
+    lowered = line.casefold()
+    words = line.split()
+
+    if len(words) < 4 or len(words) > 30:
+        return False
+
+    if re.match(
+        r"^(to consider|foreign exchange turnover data|draft scheme|scheme of|complaint report|report on|certificate of|application for)\b",
+        lowered,
+    ):
+        return True
+
+    return any(
+        token in lowered
+        for token in (
+            "scheme of merger",
+            "scheme of amalgamation",
+            "foreign exchange turnover data",
+            "complaint report",
+            "draft scheme",
+            "to consider and approve",
+            "observation letter",
+            "no objection",
+        )
+    )
+
+
 def _strip_heading_prefix(line: str) -> str:
     return re.sub(r"^(subject|sub|re|ref)\s*[:.-]\s*", "", line, flags=re.IGNORECASE)
 
 
 def _is_boilerplate_line(line: str) -> bool:
     lowered = line.casefold()
+
     if lowered.startswith(("annexure ", "page ", "date:", "dear sir", "dear madam", "dear sir/madam")):
         return True
+
     return any(
         token in lowered
         for token in (

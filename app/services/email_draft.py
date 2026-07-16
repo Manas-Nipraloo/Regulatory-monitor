@@ -32,6 +32,7 @@ def build_daily_email_message(
 ) -> EmailMessage:
     settings = get_settings()
     credentials = load_email_credentials(settings.email_credentials_file)
+
     sender = credentials.get("sender_email") or settings.email_from
     to = _join_recipients(credentials.get("to")) or settings.email_to
     cc = _join_recipients(credentials.get("cc")) or settings.email_cc
@@ -42,15 +43,26 @@ def build_daily_email_message(
     message["From"] = sender
     message["To"] = to
     message["Cc"] = cc
+
     if bcc:
         message["Bcc"] = bcc
+
     message.set_content(_draft_body(run_date, articles, date_label=date_label))
-    message.add_alternative(_draft_html_body(run_date, articles, date_label=date_label), subtype="html")
+    message.add_alternative(
+        _draft_html_body(run_date, articles, date_label=date_label),
+        subtype="html",
+    )
+
     return message
 
 
-def _draft_body(run_date: date, articles: list[ArticleResult], date_label: str | None = None) -> str:
+def _draft_body(
+    run_date: date,
+    articles: list[ArticleResult],
+    date_label: str | None = None,
+) -> str:
     settings = get_settings()
+
     lines = [
         "Dear Team,",
         "",
@@ -63,6 +75,7 @@ def _draft_body(run_date: date, articles: list[ArticleResult], date_label: str |
     ]
 
     date_groups = _group_by_effective_date(articles)
+
     if len(date_groups) <= 1:
         for remark_index, (remark, remark_articles) in enumerate(_group_by_remark(articles), start=1):
             lines.extend(_remark_section(remark_index, remark, remark_articles))
@@ -74,8 +87,19 @@ def _draft_body(run_date: date, articles: list[ArticleResult], date_label: str |
                     "",
                 ]
             )
-            for remark_index, (remark, remark_articles) in enumerate(_group_by_remark(date_articles), start=1):
-                lines.extend(_remark_section(remark_index, remark, remark_articles, indent="   "))
+
+            for remark_index, (remark, remark_articles) in enumerate(
+                _group_by_remark(date_articles),
+                start=1,
+            ):
+                lines.extend(
+                    _remark_section(
+                        remark_index,
+                        remark,
+                        remark_articles,
+                        indent="   ",
+                    )
+                )
 
     lines.extend(
         [
@@ -86,30 +110,43 @@ def _draft_body(run_date: date, articles: list[ArticleResult], date_label: str |
             settings.email_signature_title,
         ]
     )
+
     return "\n".join(lines)
 
 
 def _group_by_effective_date(articles: list[ArticleResult]) -> list[tuple[date, list[ArticleResult]]]:
     grouped: dict[date, list[ArticleResult]] = {}
+
     for article in articles:
         if not _include_in_email(article):
             continue
+
         if article.published_date is None:
             continue
+
         grouped.setdefault(article.published_date, []).append(article)
+
     return list(grouped.items())
 
 
 def _group_by_remark(articles: list[ArticleResult]) -> list[tuple[str, list[ArticleResult]]]:
     grouped: dict[str, list[ArticleResult]] = {}
+
     for article in articles:
         if not _include_in_email(article):
             continue
+
         grouped.setdefault(article.site_remark, []).append(article)
+
     return list(grouped.items())
 
 
-def _remark_section(index: int, remark: str, articles: list[ArticleResult], indent: str = "") -> list[str]:
+def _remark_section(
+    index: int,
+    remark: str,
+    articles: list[ArticleResult],
+    indent: str = "",
+) -> list[str]:
     drive_url = next(
         (
             article.drive_folder_url or article.drive_pdf_url
@@ -118,6 +155,10 @@ def _remark_section(index: int, remark: str, articles: list[ArticleResult], inde
         ),
         "Pending Google Drive upload",
     )
+
+    headings = [article.title for article in articles if article.title and article.title.strip()]
+    summaries = [article.summary for article in articles if article.summary and article.summary.strip()]
+
     return [
         f"{indent}{index}. {remark}",
         "",
@@ -125,26 +166,35 @@ def _remark_section(index: int, remark: str, articles: list[ArticleResult], inde
         "",
         f"{indent}Heading :",
         "",
-        _numbered_text([article.title for article in articles], indent=indent),
+        _numbered_text(headings, indent=indent),
         "",
         f"{indent}Summary :",
         "",
-        _numbered_text([article.summary or "Summary pending." for article in articles], indent=indent),
+        _numbered_text(summaries, indent=indent),
         "",
     ]
 
 
-def _draft_html_body(run_date: date, articles: list[ArticleResult], date_label: str | None = None) -> str:
+def _draft_html_body(
+    run_date: date,
+    articles: list[ArticleResult],
+    date_label: str | None = None,
+) -> str:
     date_groups = _group_by_effective_date(articles)
+
     if len(date_groups) <= 1:
         sections = _html_remark_sections(articles)
     else:
         sections: list[str] = []
+
         for date_index, (group_date, date_articles) in enumerate(date_groups, start=1):
-            sections.append(f"<p><strong>{date_index}. Date : {group_date.strftime('%d-%m-%Y')}</strong></p>")
+            sections.append(
+                f"<p><strong>{date_index}. Date : {group_date.strftime('%d-%m-%Y')}</strong></p>"
+            )
             sections.extend(_html_remark_sections(date_articles, left_pad=20))
 
     settings = get_settings()
+
     return f"""<!doctype html>
 <html>
   <body>
@@ -163,6 +213,7 @@ def _draft_html_body(run_date: date, articles: list[ArticleResult], date_label: 
 
 def _html_remark_sections(articles: list[ArticleResult], left_pad: int = 0) -> list[str]:
     sections: list[str] = []
+
     for remark_index, (remark, remark_articles) in enumerate(_group_by_remark(articles), start=1):
         drive_url = next(
             (
@@ -172,20 +223,27 @@ def _html_remark_sections(articles: list[ArticleResult], left_pad: int = 0) -> l
             ),
             "Pending Google Drive upload",
         )
+
         heading_items = "".join(
             f'<li style="margin-bottom: 12px;">{escape(_clean_summary_text(article.title))}</li>'
             for article in remark_articles
+            if article.title and article.title.strip()
         )
+
         summary_items = "".join(
-            f'<li style="margin-bottom: 12px;">{escape(_clean_summary_text(article.summary or "Summary pending."))}</li>'
+            f'<li style="margin-bottom: 12px;">{escape(_clean_summary_text(article.summary))}</li>'
             for article in remark_articles
+            if article.summary and article.summary.strip()
         )
+
         url_html = (
             f'<a href="{escape(drive_url)}">{escape(drive_url)}</a>'
             if drive_url.startswith("http")
             else escape(drive_url)
         )
+
         margin_style = f"margin-left: {left_pad}px;" if left_pad else ""
+
         sections.append(
             f"""
             <div style="{margin_style}">
@@ -198,46 +256,61 @@ def _html_remark_sections(articles: list[ArticleResult], left_pad: int = 0) -> l
             </div>
             """
         )
+
     return sections
 
 
 def _numbered_text(values: list[str], indent: str = "") -> str:
     cleaned = [_clean_summary_text(value) for value in values if value and value.strip()]
+
     if not cleaned:
         return ""
-    numbered = [f"{indent}{index}. {value}" for index, value in enumerate(cleaned, start=1)]
+
+    numbered = [
+        f"{indent}{index}. {value}"
+        for index, value in enumerate(cleaned, start=1)
+    ]
+
     return "\n\n".join(numbered)
 
 
 def _clean_summary_text(value: str) -> str:
-    words = " ".join(value.split()).split()
-    if len(words) <= 55:
-        return " ".join(words)
-    return " ".join(words[:55]).rstrip(" .,;:")
+    # Important:
+    # Do not cut heading or summary here.
+    # This email should show the same heading and summary as the website/UI.
+    return " ".join((value or "").split()).strip()
 
 
 def _include_in_email(article: ArticleResult) -> bool:
     text = f"{article.title} {article.summary or ''}"
     lowered = text.casefold()
+
     if "ieib" in lowered or "could not be read clearly enough" in lowered:
         return False
+
     if text.strip().startswith(("On B }", "]_&")):
         return False
+
     return True
 
 
 def _join_recipients(value: object) -> str:
     if isinstance(value, list):
         return ", ".join(str(item).strip() for item in value if str(item).strip())
+
     if isinstance(value, str):
         return value.strip()
+
     return ""
 
 
 def _clean_subject(value: str) -> str:
     subject = value.strip()
+
     if subject.casefold().startswith("subject"):
         _, separator, remainder = subject.partition(":")
+
         if separator:
             return remainder.strip()
+
     return subject
