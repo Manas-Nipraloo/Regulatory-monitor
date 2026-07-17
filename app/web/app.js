@@ -253,6 +253,12 @@ function handleStreamEvent(event) {
     appendLiveLog(`Generating heading/summary for ${event.index} of ${event.total}: ${event.title}`);
     return;
   }
+  if (event.type === "document" && event.status === "skipped_existing") {
+    const text = `Skipping ${event.index} of ${event.total}: ${event.title} already exists in Drive.`;
+    setMessage(text, "running");
+    appendLiveLog(text, "success");
+    return;
+  }
   if (event.type === "article") {
     articleCount.textContent = event.count;
     appendArticle(event.article);

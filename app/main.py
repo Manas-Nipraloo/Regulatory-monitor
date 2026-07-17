@@ -17,7 +17,13 @@ from app.services.run_history import list_history, record_history
 from app.services.site_registry import discover_current_date_articles, get_sites
 from app.services.smtp_email import send_smtp_email, smtp_credentials_ready
 from app.services import pending_store
-from app.tasks.daily_monitor import DOWNLOAD_HEADERS, _process_downloaded_item_incremental, run_daily_monitor
+from app.tasks.daily_monitor import (
+    DOWNLOAD_HEADERS,
+    SkippedExistingPdf,
+    _existing_drive_pdf_url,
+    _process_downloaded_item_incremental_with_skips,
+    run_daily_monitor,
+)
 from app.tasks.pending_monitor import accept_pending, build_email_for_date, deny_pending, discover_to_pending
 
 
@@ -48,6 +54,7 @@ def health() -> dict[str, str]:
 @app.post("/tasks/daily-run", response_model=DailyRunResponse)
 async def daily_run(request: DailyRunRequest) -> DailyRunResponse:
     run_date = request.run_date or date.today()
+
     response = await run_daily_monitor(
         run_date=run_date,
         site_filters=request.site_filters,
@@ -55,8 +62,10 @@ async def daily_run(request: DailyRunRequest) -> DailyRunResponse:
         save_webmail_draft=request.save_webmail_draft,
         send_email_enabled=request.send_email,
     )
+
     sources = [site.remark for site in get_sites(request.site_filters)]
     record_history(response, sources, request.upload_drive, request.save_webmail_draft, request.send_email)
+
     return response
 
 
@@ -67,9 +76,11 @@ async def daily_run_stream(request: DailyRunRequest) -> StreamingResponse:
     async def events():
         articles = []
         errors: list[str] = []
+        skipped_existing = 0
         sites = get_sites(request.site_filters)
 
         yield _json_line({"type": "start", "site_count": len(sites)})
+
         async with httpx.AsyncClient(
             timeout=settings.download_timeout_seconds,
             follow_redirects=True,
@@ -77,6 +88,7 @@ async def daily_run_stream(request: DailyRunRequest) -> StreamingResponse:
         ) as client:
             for site in sites:
                 yield _json_line({"type": "source", "remark": site.remark, "status": "checking"})
+
                 try:
                     discovered = await discover_current_date_articles(run_date, site)
                 except Exception as exc:
@@ -93,9 +105,28 @@ async def daily_run_stream(request: DailyRunRequest) -> StreamingResponse:
                         "count": len(discovered),
                     }
                 )
+
                 for index, item in enumerate(discovered, start=1):
                     if item.published_date and item.published_date != run_date:
                         continue
+
+                    if request.upload_drive:
+                        existing = _existing_drive_pdf_url(run_date, item)
+
+                        if existing:
+                            skipped_existing += 1
+                            yield _json_line(
+                                {
+                                    "type": "document",
+                                    "status": "skipped_existing",
+                                    "index": index,
+                                    "total": len(discovered),
+                                    "title": item.title,
+                                    "site_remark": site.remark,
+                                    "drive_pdf_url": existing,
+                                }
+                            )
+                            continue
 
                     yield _json_line(
                         {
@@ -107,8 +138,10 @@ async def daily_run_stream(request: DailyRunRequest) -> StreamingResponse:
                             "site_remark": site.remark,
                         }
                     )
+
                     try:
                         content = await download_document_bytes(client, item, DOWNLOAD_HEADERS)
+
                         yield _json_line(
                             {
                                 "type": "document",
@@ -119,28 +152,48 @@ async def daily_run_stream(request: DailyRunRequest) -> StreamingResponse:
                                 "size": len(content),
                             }
                         )
-                        for article in _process_downloaded_item_incremental(
+
+                        for result in _process_downloaded_item_incremental_with_skips(
                             run_date,
                             item,
                             content,
                             upload_drive=request.upload_drive,
                         ):
-                            articles.append(article)
+                            if isinstance(result, SkippedExistingPdf):
+                                skipped_existing += 1
+                                yield _json_line(
+                                    {
+                                        "type": "document",
+                                        "status": "skipped_existing",
+                                        "index": index,
+                                        "total": len(discovered),
+                                        "title": result.pdf_name,
+                                        "site_remark": site.remark,
+                                        "drive_pdf_url": result.drive_pdf_url,
+                                    }
+                                )
+                                continue
+
+                            articles.append(result)
+
                             yield _json_line(
                                 {
                                     "type": "article",
                                     "count": len(articles),
-                                    "article": article.model_dump(mode="json"),
+                                    "article": result.model_dump(mode="json"),
                                 }
                             )
+
                     except Exception as exc:
                         error = f"{site.remark}: {item.title} failed ({exc})"
                         errors.append(error)
                         yield _json_line({"type": "error", "message": error})
 
         draft_path = save_daily_email_draft(run_date, articles) if articles else None
+
         webmail_draft_saved = False
         webmail_draft_error = None
+
         if articles and request.save_webmail_draft and imap_credentials_ready(settings.email_credentials_file):
             try:
                 webmail_draft_saved = save_imap_draft(
@@ -152,6 +205,7 @@ async def daily_run_stream(request: DailyRunRequest) -> StreamingResponse:
 
         email_sent = False
         email_error = None
+
         if articles and request.send_email and smtp_credentials_ready(settings.email_credentials_file):
             try:
                 email_sent = send_smtp_email(
@@ -162,14 +216,20 @@ async def daily_run_stream(request: DailyRunRequest) -> StreamingResponse:
                 email_error = str(exc)
 
         message = "Daily run completed."
+
         if not articles:
             message = "No current-date articles found. No Drive upload or email draft was created."
         elif email_sent:
             message = "Daily run completed and email sent."
         elif email_error:
             message = f"Daily run completed, but email sending failed: {email_error}"
+
+        if skipped_existing:
+            message = f"{message} Skipped {skipped_existing} PDF(s) already present in Drive."
+
         if errors:
             message = f"{message} Issues: {'; '.join(errors[:3])}"
+
             if len(errors) > 3:
                 message = f"{message}; plus {len(errors) - 3} more."
 
@@ -184,6 +244,7 @@ async def daily_run_stream(request: DailyRunRequest) -> StreamingResponse:
             email_error=email_error,
             message=message,
         )
+
         record_history(
             response,
             [site.remark for site in sites],
@@ -191,6 +252,7 @@ async def daily_run_stream(request: DailyRunRequest) -> StreamingResponse:
             request.save_webmail_draft,
             request.send_email,
         )
+
         yield _json_line(
             {
                 "type": "done",
@@ -233,10 +295,10 @@ def history(limit: int = 50, run_date: date | None = None) -> list[RunHistoryEnt
 def pending_list() -> list[dict[str, object]]:
     if not pending_store.enabled():
         return []
+
     try:
         return [item.model_dump(mode="json") for item in pending_store.list_pending()]
     except Exception:
-        # Table not created yet or Supabase unreachable — show an empty queue.
         return []
 
 
@@ -244,8 +306,10 @@ def pending_list() -> list[dict[str, object]]:
 async def pending_refresh(request: DailyRunRequest) -> dict[str, object]:
     if not pending_store.enabled():
         return {"discovered": 0, "added": 0, "errors": ["Supabase is not configured."]}
+
     run_date = request.run_date or date.today()
     lookback = get_settings().pending_lookback_days
+
     return await discover_to_pending(run_date, request.site_filters or None, lookback_days=lookback)
 
 
@@ -273,4 +337,5 @@ def pending_build_email(request: DailyRunRequest) -> dict[str, object]:
 @app.post("/pdfs/extract", response_model=PdfExtractionResponse)
 async def extract_pdf(file: UploadFile = File(...)) -> PdfExtractionResponse:
     content = await file.read()
+
     return extract_pdf_metadata(filename=file.filename or "uploaded.pdf", content=content)

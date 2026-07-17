@@ -1083,6 +1083,7 @@ async function runReal(label, sources){
     if(ev.type === 'source' && ev.status === 'matched'){ logLine(`${ev.remark}: ${ev.count} matching document(s).`, 'brass-line'); return; }
     if(ev.type === 'document' && ev.status === 'downloading'){ logLine(`Downloading ${ev.index}/${ev.total}: ${ev.title}`); return; }
     if(ev.type === 'document' && ev.status === 'processing'){ logLine(`Extracting ${ev.index}/${ev.total}: ${ev.title}`); return; }
+    if(ev.type === 'document' && ev.status === 'skipped_existing'){ logLine(`Skipping ${ev.index}/${ev.total}: ${ev.title} already exists in Drive.`, 'ok-line'); return; }
     if(ev.type === 'article'){
       matched = ev.count; cMatched.textContent = String(matched);
       appendResultRow(ev.article);

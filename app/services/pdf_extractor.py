@@ -378,11 +378,14 @@ def _looks_like_main_heading(line: str) -> bool:
     lowered = line.casefold()
     words = line.split()
 
-    if len(words) < 4 or len(words) > 30:
+    if len(words) < 4 or len(words) > 34:
+        return False
+
+    if _is_boilerplate_line(line):
         return False
 
     if re.match(
-        r"^(to consider|foreign exchange turnover data|draft scheme|scheme of|complaint report|report on|certificate of|application for)\b",
+        r"^(to consider|foreign exchange turnover data|draft scheme|scheme of|complaint report|report on|certificate of|application for|reserve bank of india .* directions|rbi .* directions)\b",
         lowered,
     ):
         return True
@@ -398,6 +401,15 @@ def _looks_like_main_heading(line: str) -> bool:
             "to consider and approve",
             "observation letter",
             "no objection",
+            "amendment directions",
+            "master direction",
+            "directions, 2026",
+            "directions, 2025",
+            "circular",
+            "notification",
+            "income recognition",
+            "asset classification",
+            "provisioning",
         )
     )
 
@@ -407,20 +419,50 @@ def _strip_heading_prefix(line: str) -> str:
 
 
 def _is_boilerplate_line(line: str) -> bool:
-    lowered = line.casefold()
+    lowered = " ".join(line.casefold().split())
+    compact = re.sub(r"[^a-z0-9]", "", lowered)
 
     if lowered.startswith(("annexure ", "page ", "date:", "dear sir", "dear madam", "dear sir/madam")):
+        return True
+
+    # Block separator-only lines like _________ or ---------
+    if re.fullmatch(r"[_\-\s|.]{5,}", line):
+        return True
+
+    # Block generic letterhead-only headings.
+    generic_letterheads = {
+        "reservebankofindia",
+        "rbi",
+        "bharatiyarizvarbank",
+        "securitiesandexchangeboardofindia",
+        "sebi",
+        "governmentofindia",
+        "nationalstockexchangeofindia",
+        "bombaystockexchange",
+        "bse",
+        "nse",
+        "departmentofregulation",
+        "centraloffice",
+    }
+
+    if compact in generic_letterheads:
         return True
 
     return any(
         token in lowered
         for token in (
+            "www.rbi.org.in",
             "regd. office",
             "registered office",
+            "department of regulation",
+            "central office",
+            "central office building",
+            "shahid bhagat singh marg",
             "website :",
             "website:",
             "phone :",
             "phone:",
+            "tel no",
             "fax",
             "cin:",
             "email:",
@@ -430,6 +472,7 @@ def _is_boilerplate_line(line: str) -> bool:
             "nse symbol",
             "scrip code",
             "kind attn",
+            "हिंदी आसान",
         )
     )
 

@@ -169,6 +169,7 @@ def _prompt(filename: str) -> str:
         "4. If the PDF is a scheme document, use the scheme title and parties involved. "
         "5. The heading should be clean, readable, and specific. "
         "6. Prefer a concise title over copying a very long paragraph. "
+        "7. Do NOT use letterhead text such as Reserve Bank of India, Government of India, SEBI, BSE, NSE, logos, separator lines, website text, or department names as the heading when a more specific circular, direction, notification, or document title is present. "
 
         "\n\nSUMMARY RULES:\n"
         "1. The summary must contain only information from the PDF content. "
@@ -215,10 +216,19 @@ def _prompt(filename: str) -> str:
         "\"summary\":\"The scheme provides for merger by absorption of IVIS International Private Limited into Magellanic Cloud Limited under Sections 230 to 232 of the Companies Act, 2013. Since IVIS is a wholly owned subsidiary of Magellanic Cloud, the scheme states that shares held by Magellanic in IVIS will stand cancelled without fresh consideration.\""
         "}\n"
 
+        "Example 5:\n"
+        "Input document: RBI direction with RBI letterhead and a specific amendment title.\n"
+        "Output JSON:\n"
+        "{"
+        "\"heading\":\"Reserve Bank of India (Commercial Banks – Income Recognition, Asset Classification and Provisioning) Second Amendment Directions, 2026\","
+        "\"summary\":\"The RBI amended the Commercial Banks Income Recognition, Asset Classification and Provisioning Directions to add income-recognition rules for acquisition of Specified Non-Financial Assets. The amendment states how unrealised interest, charges, income, and expenses related to such assets must be accounted for and comes into force from October 01, 2026.\""
+        "}\n"
+
         "\n\nIMPORTANT NEGATIVE EXAMPLES:\n"
         "Do NOT write: 'NOC under Regulation 37 Updates published...'\n"
         "Do NOT write: 'The uploaded PDF should be reviewed...'\n"
         "Do NOT write: 'This scanned PDF could not be read clearly enough...'\n"
+        "Do NOT write: 'RESERVE BANK OF INDIA' when the PDF has a more specific direction, circular, notification, or amendment title.\n"
         "Do NOT write only the company address, CIN, registered office, or contact details.\n"
         "Do NOT simply repeat Annexure labels.\n"
 
@@ -228,7 +238,11 @@ def _prompt(filename: str) -> str:
 
 def _clean_heading(value: str) -> str:
     cleaned = " ".join((value or "").split()).strip()
-    cleaned = cleaned.strip(" -:;,.")
+
+    # Remove long separator lines like _____ or ----- that often come from letterheads.
+    cleaned = re.sub(r"[_\-]{3,}", " ", cleaned)
+
+    cleaned = " ".join(cleaned.split()).strip(" -:;,.|_")
     return cleaned[:260]
 
 
@@ -298,6 +312,30 @@ def _bad_ai_output(heading: str, summary: str) -> bool:
         return True
 
     if "cin:" in heading_lower or "website:" in heading_lower or "phone:" in heading_lower:
+        return True
+
+    # Block separator/letterhead headings like "________ RESERVE BANK OF INDIA ________".
+    if "_" in heading or re.search(r"[_\-]{5,}", heading):
+        return True
+
+    normalized_heading = re.sub(r"[^a-z0-9 ]", " ", heading_lower)
+    normalized_heading = " ".join(normalized_heading.split())
+
+    generic_letterheads = (
+        "reserve bank of india",
+        "rbi",
+        "securities and exchange board of india",
+        "sebi",
+        "government of india",
+        "bombay stock exchange",
+        "bse",
+        "national stock exchange",
+        "nse",
+        "department of regulation",
+        "central office",
+    )
+
+    if normalized_heading in generic_letterheads:
         return True
 
     return False
