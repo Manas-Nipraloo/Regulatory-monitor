@@ -27,8 +27,10 @@ class Settings(BaseSettings):
     email_signature_name: str = "Manas Aher"
     email_signature_title: str = "Junior Web Developer"
     groq_api_key: str = ""
-    groq_model: str = "meta-llama/llama-4-scout-17b-16e-instruct"
+    groq_model: str = "llama-3.3-70b-versatile"
     groq_max_pdf_pages: int = 5
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-3.5-flash"
     email_credentials_file: Path = Path("config/credentials/email_draft_credentials.json")
     supabase_url: str = ""
     supabase_key: str = ""

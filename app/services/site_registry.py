@@ -137,6 +137,12 @@ async def discover_all_current_articles(site: SiteConfig) -> list[DiscoveredArti
         from app.services.scrapers.bse_noc_under import all_bse_noc_articles
 
         return await all_bse_noc_articles(site)
+    if "mca.gov.in" in site.url.casefold() and (
+        "latest-news" in site.url.casefold() or "whats-new" in site.url.casefold()
+    ):
+        from app.services.scrapers.mca_latest_news import all_mca_latest_news_articles
+
+        return await all_mca_latest_news_articles(site)
     return None
 
 

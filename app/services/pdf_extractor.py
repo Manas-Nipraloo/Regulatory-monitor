@@ -5,6 +5,7 @@ import re
 from pypdf import PdfReader
 
 from app.config import get_settings
+from app.services.gemini_extractor import extract_scanned_pdf_with_gemini, extract_text_pdf_with_gemini
 from app.schemas import PdfExtractionResponse
 from app.services.groq_extractor import extract_scanned_pdf_with_groq, extract_text_pdf_with_groq
 
@@ -34,6 +35,10 @@ def extract_pdf_metadata(filename: str, content: bytes) -> PdfExtractionResponse
         ai_result = extract_scanned_pdf_with_groq(filename, content)
         print("AI RESULT FROM GROQ VISION:", ai_result)
 
+        if not ai_result:
+            ai_result = extract_scanned_pdf_with_gemini(filename, content)
+            print("AI RESULT FROM GEMINI VISION FALLBACK:", ai_result)
+
         if ai_result:
             heading, summary = ai_result
         elif _has_meaningful_text(text):
@@ -47,6 +52,10 @@ def extract_pdf_metadata(filename: str, content: bytes) -> PdfExtractionResponse
         ai_result = extract_text_pdf_with_groq(filename, text)
         print("AI RESULT FROM GROQ TEXT:", ai_result)
 
+        if not ai_result:
+            ai_result = extract_text_pdf_with_gemini(filename, text)
+            print("AI RESULT FROM GEMINI TEXT FALLBACK:", ai_result)
+
         if ai_result:
             heading, summary = ai_result
         else:
@@ -56,6 +65,10 @@ def extract_pdf_metadata(filename: str, content: bytes) -> PdfExtractionResponse
     else:
         ai_result = extract_scanned_pdf_with_groq(filename, content)
         print("AI RESULT FROM GROQ FALLBACK VISION:", ai_result)
+
+        if not ai_result:
+            ai_result = extract_scanned_pdf_with_gemini(filename, content)
+            print("AI RESULT FROM GEMINI FALLBACK VISION:", ai_result)
 
         if ai_result:
             heading, summary = ai_result

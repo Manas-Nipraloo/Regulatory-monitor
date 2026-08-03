@@ -20,35 +20,51 @@ TABMESSAGES_FRAGMENT = "/bin/dms/tabmessages"
 
 
 async def discover_mca_latest_news(run_date: date, site: SiteConfig) -> list[DiscoveredArticle]:
+    """Date-based discovery: only items whose printed date equals run_date."""
     rows = await _latest_news_rows(site.url)
     articles: list[DiscoveredArticle] = []
-
     for row in rows:
-        published_date = _parse_mca_date(str(row.get("column2") or ""))
-        if published_date != run_date:
+        article = _row_to_article(row, site)
+        if article is None or article.published_date != run_date:
             continue
-
-        doc_id = str(row.get("docID") or "").strip()
-        href = str(row.get("column3") or "").strip()
-        if doc_id and not href:
-            href = f"/bin/dms/getdocument?mds={quote(doc_id, safe='')}&type=download"
-        if not href:
-            continue
-
-        title = _clean_text(str(row.get("column1") or ""))
-        pdf_url = urljoin(site.url, href)
-        articles.append(
-            DiscoveredArticle(
-                site=site,
-                title=title,
-                source_url=site.url,
-                pdf_url=pdf_url,
-                published_date=published_date,
-                filename=_filename_from_url(pdf_url) or f"{title[:80]}.pdf",
-            )
-        )
-
+        articles.append(article)
     return articles
+
+
+async def all_mca_latest_news_articles(site: SiteConfig) -> list[DiscoveredArticle]:
+    """Every item currently listed on the MCA page, regardless of date.
+
+    Used by 'new arrivals' detection so items that appear late (or carry an older
+    printed date than the day they show up) are still caught — MCA lists items the
+    same way BSE does.
+    """
+    rows = await _latest_news_rows(site.url)
+    articles: list[DiscoveredArticle] = []
+    for row in rows:
+        article = _row_to_article(row, site)
+        if article is not None:
+            articles.append(article)
+    return articles
+
+
+def _row_to_article(row: dict[str, object], site: SiteConfig) -> DiscoveredArticle | None:
+    doc_id = str(row.get("docID") or "").strip()
+    href = str(row.get("column3") or "").strip()
+    if doc_id and not href:
+        href = f"/bin/dms/getdocument?mds={quote(doc_id, safe='')}&type=download"
+    if not href:
+        return None
+
+    title = _clean_text(str(row.get("column1") or ""))
+    pdf_url = urljoin(site.url, href)
+    return DiscoveredArticle(
+        site=site,
+        title=title,
+        source_url=site.url,
+        pdf_url=pdf_url,
+        published_date=_parse_mca_date(str(row.get("column2") or "")),
+        filename=_filename_from_url(pdf_url) or f"{title[:80]}.pdf",
+    )
 
 
 async def _latest_news_rows(url: str) -> list[dict[str, object]]:

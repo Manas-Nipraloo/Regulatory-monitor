@@ -128,3 +128,122 @@ What To Do Next
 Notes
 - The FastAPI server may still be running in the background from earlier.
 - OAuth helper was stopped when we paused.
+
+
+Regulatory Monitor - Session Handoff Update
+Date: 14-07-2026
+
+What Changed In This Session
+- Fixed multiple runtime/import issues by making some heavy dependencies lazy-load instead of importing at app startup.
+- Changed the pending-review workflow so accepted items upload to Drive first, then a combined email draft is created later.
+- Added better status reporting for Hostinger/IMAP draft creation failures.
+- Reworked combined email drafting so one draft can include accepted articles across multiple dates, grouped by date.
+- Added more run-history recording for pending accept/build actions.
+- Fixed dashboard wiring issues around refresh/build-email/history.
+- Improved PDF heading/summary extraction rules, especially for scanned PDFs, annexure-style PDFs, and noisy OCR.
+
+Key Files Changed This Session
+- app/main.py
+- app/tasks/pending_monitor.py
+- app/tasks/daily_monitor.py
+- app/services/pdf_extractor.py
+- app/services/groq_extractor.py
+- app/services/document_downloader.py
+- app/services/scrapers/mca_latest_news.py
+- app/services/imap_draft.py
+- app/services/run_history.py
+- app/web/index.html
+- app/web/history.html
+- .env
+
+Current Pending-Review / Email Behavior
+- Clicking Accept uploads the PDF to Drive and marks the pending item accepted.
+- Accept does NOT create the Hostinger draft immediately.
+- The combined draft is created only when clicking Build all accepted.
+- Build all accepted was changed to ignore the dashboard date and build from all accepted items by default.
+- Source filtering for Build all accepted is still kept.
+
+Important Behavior Fixes
+- Removed the bad behavior where many PDFs could inherit the exact same heading/summary from one parent article title.
+- Removed raw PDF filename fallback as a visible heading.
+- If extracted heading is unusable, heading now falls back to the cleaner source/article title instead of a machine-style filename.
+- Summary fallback still shows a neutral review-needed message when extraction is unreadable.
+- Added filtering so index/table-of-contents lines like "1.1 ..." or numbered annexure lists are less likely to become headings.
+
+Groq / PDF Extraction State
+- Scanned/image PDFs now allow Groq to inspect at least 5 pages.
+- Text PDFs now send a broader text sample to Groq:
+  beginning + middle + end of the document instead of only the opening chunk.
+- Groq prompt was tightened to ignore annexure labels, address blocks, CIN/registered-office text, and page furniture.
+- Extraction is still imperfect for some annexure-heavy PDFs and may need further tuning.
+
+Known Current PDF Extraction Issues
+- Some annexure or scanned PDFs still produce weak headings/summaries.
+- If the first pages are a contents/index page, extraction can still be imperfect even after filtering.
+- Good ChatGPT-style summaries are still better than the current automated extractor in some documents.
+
+Drive / OAuth / Service Account State
+- config/credentials/google_oauth_credentials.json was updated to a newer OAuth client:
+  client id beginning with 124118758864-a25i0v...
+- That OAuth file is internally consistent now (client_id + client_secret + refresh_token match).
+- Despite that, OAuth Drive upload had repeated invalid_grant issues earlier.
+- A valid service account file also exists:
+  config/credentials/google_service_account.json
+- Service account email:
+  regulatory-monitor-drive@regulatory-monitor-499906.iam.gserviceaccount.com
+- If switching to service account later, set GOOGLE_SERVICE_ACCOUNT_FILE in .env and share the Drive folder with that email as Editor.
+
+Current MCA / Playwright Problem
+- MCA sources fail because Playwright is unavailable in the environment.
+- Root cause identified from Playwright install output:
+  missing Windows dependency msvcp140_1.dll
+- This means Microsoft Visual C++ Redistributable (x64) must be installed.
+- Python 3.14 was avoided; a new Python 3.12.10 environment was created instead.
+- Even in Python 3.12, Playwright still needs the missing VC++ runtime before MCA can work.
+
+Exact MCA Error Meaning
+- "Playwright is unavailable in this Python environment. MCA discovery requires a working Playwright install."
+- This is not a scraper logic bug.
+- It is an environment/runtime dependency issue.
+
+What To Do To Fix MCA Next Time
+1. Install Microsoft Visual C++ Redistributable x64 (vc_redist.x64.exe).
+2. Open a fresh PowerShell window.
+3. Activate .venv.
+4. Run:
+   python -m playwright install
+5. Test:
+   python -c "from playwright.async_api import async_playwright; print('playwright ok')"
+6. Then MCA sources should work again.
+
+Dashboard / UI State
+- Build all accepted button exists in app/web/index.html and calls /pending/build-email.
+- Dashboard refresh now refreshes pending-review state rather than doing a full re-scrape.
+- History page is wired and fetches /history.
+- Some old/stale UI text was cleaned up, but index.html was reconstructed earlier and may still not be byte-for-byte identical to the original design.
+
+Hostinger Draft Issue Explained
+- If Drive upload succeeds but no Hostinger draft appears, the usual cause is:
+  accepted items existed, but build-email previously filtered by date/source and found none.
+- This session changed Build all accepted to stop filtering by dashboard date.
+- If draft creation still fails after that, the next place to inspect is IMAP/Hostinger behavior directly.
+
+Environment Notes
+- Python 3.12.10 is now installed on the machine.
+- The old .venv tied to Python 3.14 was replaced.
+- If deleting .venv on Windows fails, stop all python/uvicorn processes first.
+
+Security Notes
+- Real secrets/tokens appeared in chat and local files during troubleshooting.
+- These should be rotated after the setup is stable:
+  - OAuth client secret
+  - Google refresh token
+  - service account key if needed
+  - email SMTP/IMAP password if it was exposed
+
+Suggested Next Steps
+1. Install VC++ redistributable and verify Playwright works.
+2. Re-test MCA sources.
+3. Re-test Build all accepted and confirm Hostinger draft creation.
+4. Re-run a few bad annexure PDFs and verify heading/summary quality.
+5. If annexure extraction is still weak, add a stronger annexure-specific rule in app/services/pdf_extractor.py.

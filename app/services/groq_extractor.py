@@ -13,6 +13,14 @@ from app.config import get_settings
 GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions"
 MAX_TEXT_CHARS = 36000
 
+# Substrings of Groq model ids that accept image inputs. Anything else is text-only.
+VISION_MODEL_HINTS = ("llama-4", "scout", "maverick", "vision")
+
+
+def _model_supports_vision(model: str) -> bool:
+    lowered = (model or "").lower()
+    return any(hint in lowered for hint in VISION_MODEL_HINTS)
+
 
 def extract_text_pdf_with_groq(filename: str, text: str) -> tuple[str, str] | None:
     settings = get_settings()
@@ -44,6 +52,11 @@ def extract_scanned_pdf_with_groq(filename: str, content: bytes) -> tuple[str, s
 
     if not settings.groq_api_key:
         print("ERROR: GROQ_API_KEY is missing.")
+        return None
+
+    # Text-only Groq models reject image parts, so skip straight to the Gemini fallback.
+    if not _model_supports_vision(settings.groq_model):
+        print(f"SKIP: Groq model {settings.groq_model} is text-only; leaving vision to Gemini.")
         return None
 
     # Groq vision model supports maximum 5 images.
@@ -107,8 +120,8 @@ def _request_groq(content_parts: list[dict[str, Any]]) -> tuple[str, str] | None
             with httpx.Client(timeout=120) as client:
                 response = client.post(GROQ_CHAT_URL, headers=headers, json=payload)
 
-            if response.status_code == 429:
-                print("GROQ RATE LIMIT:", response.text[:3000])
+            if response.status_code == 429 or response.status_code >= 500:
+                print("GROQ RETRYABLE ERROR:", response.status_code, response.text[:3000])
 
                 wait_seconds = 20 * attempt
                 print(f"Waiting {wait_seconds} seconds before retry...")
@@ -246,38 +259,38 @@ def _clean_heading(value: str) -> str:
     return cleaned[:260]
 
 
+# Abbreviations whose trailing period must not be read as a sentence end. Regulatory
+# orders are full of "Rs. 25 lakh", "ITA No. 414", "Gudari Ltd. vs ITO" — splitting on
+# those truncated summaries mid-clause.
+_ABBREVIATIONS = (
+    "Mr", "Mrs", "Ms", "Dr", "Shri", "Smt", "Sri", "Hon",
+    "Ltd", "Pvt", "Co", "Corp", "Inc", "Pte",
+    "Rs", "No", "Nos", "DIN", "CIN", "PAN",
+    "Sec", "Art", "Reg", "Cl", "Sch", "Ch", "Pt", "para", "Para",
+    "Anr", "Ors", "vs", "v", "Sr", "Jt", "Asst", "Addl", "Dy",
+    "Govt", "Dept", "Adv", "AR", "DR",
+    "etc", "approx",
+)
+
+_ABBREVIATION_RE = re.compile(
+    r"\b(" + "|".join(re.escape(abbr) for abbr in _ABBREVIATIONS) + r")\.",
+)
+
+
 def _clean_summary(value: str) -> str:
     cleaned = " ".join((value or "").split()).strip()
 
     if not cleaned:
         return ""
 
-    # Protect common abbreviations so sentence splitting does not cut at "Mr.", "Dr.", etc.
-    abbreviations = {
-        "Mr.": "Mr<dot>",
-        "Mrs.": "Mrs<dot>",
-        "Ms.": "Ms<dot>",
-        "Dr.": "Dr<dot>",
-        "Shri.": "Shri<dot>",
-        "Smt.": "Smt<dot>",
-        "Ltd.": "Ltd<dot>",
-        "Pvt.": "Pvt<dot>",
-        "No.": "No<dot>",
-        "DIN.": "DIN<dot>",
-    }
-
-    protected = cleaned
-
-    for original, replacement in abbreviations.items():
-        protected = protected.replace(original, replacement)
+    # Protect abbreviations so sentence splitting does not cut at "Rs.", "Mr.", "No.", etc.
+    # Matched on word boundaries: a plain replace would mangle "Rev." into "Re" + "v.".
+    protected = _ABBREVIATION_RE.sub(lambda match: f"{match.group(1)}<dot>", cleaned)
 
     sentences = re.split(r"(?<=[.!?])\s+", protected)
     summary = " ".join(sentences[:2]).strip()
 
-    for original, replacement in abbreviations.items():
-        summary = summary.replace(replacement, original)
-
-    return summary
+    return summary.replace("<dot>", ".")
 
 
 def _bad_ai_output(heading: str, summary: str) -> bool:
