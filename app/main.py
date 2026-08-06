@@ -3,24 +3,33 @@ import json
 from pathlib import Path
 
 import httpx
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.schemas import DailyRunRequest, DailyRunResponse, PdfExtractionResponse, RunHistoryEntry
+from app.schemas import (
+    DailyRunRequest,
+    DailyRunResponse,
+    ManualDraftRequest,
+    PdfExtractionResponse,
+    RunHistoryEntry,
+)
 from app.services.document_downloader import download_document_bytes
 from app.services.email_draft import build_daily_email_message, save_daily_email_draft
 from app.services.imap_draft import imap_credentials_ready, save_imap_draft
 from app.services.pdf_extractor import extract_pdf_metadata
-from app.services.run_history import list_history, record_history
-from app.services.site_registry import discover_current_date_articles, get_sites
+from app.services.run_history import list_history, record_history, record_manual_history
+from app.services.site_registry import DiscoveredArticle, SiteConfig, discover_current_date_articles, get_sites
 from app.services.smtp_email import send_smtp_email, smtp_credentials_ready
+from app.services.storage import safe_folder_name
 from app.services import pending_store
 from app.tasks.daily_monitor import (
     DOWNLOAD_HEADERS,
     SkippedExistingPdf,
+    _article_from_pdf,
     _existing_drive_pdf_url,
+    _pdf_filename,
     _process_downloaded_item_incremental_with_skips,
     run_daily_monitor,
 )
@@ -44,6 +53,11 @@ def index() -> FileResponse:
 @app.get("/history-page")
 def history_page() -> FileResponse:
     return FileResponse(WEB_DIR / "history.html", media_type="text/html; charset=utf-8")
+
+
+@app.get("/manual-page")
+def manual_page() -> FileResponse:
+    return FileResponse(WEB_DIR / "manual.html", media_type="text/html; charset=utf-8")
 
 
 @app.get("/health")
@@ -343,3 +357,139 @@ async def extract_pdf(file: UploadFile = File(...)) -> PdfExtractionResponse:
     content = await file.read()
 
     return extract_pdf_metadata(filename=file.filename or "uploaded.pdf", content=content)
+
+
+@app.post("/manual/summarize")
+async def manual_summarize(
+    file: UploadFile = File(...),
+    published_date: str = Form(...),
+    title: str = Form(""),
+    site_remark: str = Form("GOI income tax website"),
+) -> dict[str, object]:
+    """For sources the automated scrapers can't reach: process a manually-downloaded
+    PDF through the same extract + Drive-upload pipeline used for discovered articles."""
+    try:
+        parsed_date = date.fromisoformat(published_date)
+    except ValueError:
+        return {"ok": False, "error": "Invalid date. Use YYYY-MM-DD."}
+
+    content = await file.read()
+    if not content:
+        return {"ok": False, "error": "Uploaded file is empty."}
+
+    raw_name = file.filename or "document.pdf"
+    pdf_name = safe_folder_name(
+        raw_name if raw_name.lower().endswith(".pdf") else _pdf_filename(title.strip() or Path(raw_name).stem)
+    )
+    remark = site_remark.strip() or "GOI income tax website"
+
+    site = SiteConfig(
+        name="Manual Upload", remark=remark, url="https://www.incometaxindia.gov.in/"
+    )
+    item = DiscoveredArticle(
+        site=site,
+        title=title.strip(),
+        source_url=site.url,
+        pdf_url="",
+        published_date=parsed_date,
+        filename=raw_name,
+    )
+
+    try:
+        result = _article_from_pdf(parsed_date, item, pdf_name, content, upload_drive=True)
+    except Exception as exc:
+        return {"ok": False, "error": f"Processing failed: {exc}"}
+
+    return {"ok": True, "article": result.model_dump(mode="json")}
+
+
+def _manual_draft_labels(
+    articles: list, run_date: date | None
+) -> tuple[date, str, str]:
+    """Shared date/subject-label math for the manual draft + preview endpoints."""
+    dated = [a.published_date for a in articles if a.published_date]
+    first_date = min(dated) if dated else date.today()
+    last_date = max(dated) if dated else first_date
+    draft_date = run_date or last_date
+
+    if first_date == last_date:
+        date_text = first_date.strftime("%d-%m-%Y")
+        file_label = date_text
+    else:
+        date_text = f"{first_date.strftime('%d-%m-%Y')} to {last_date.strftime('%d-%m-%Y')}"
+        file_label = f"{first_date.strftime('%d-%m-%Y')}_to_{last_date.strftime('%d-%m-%Y')}"
+
+    return draft_date, date_text, file_label
+
+
+@app.post("/manual/preview-email")
+def manual_preview_email(request: ManualDraftRequest) -> dict[str, object]:
+    articles = request.articles
+    if not articles:
+        return {"ok": False, "error": "No articles to preview."}
+
+    draft_date, date_text, _ = _manual_draft_labels(articles, request.run_date)
+    message = build_daily_email_message(draft_date, articles, date_label=date_text)
+    html_part = message.get_body(preferencelist=("html",))
+
+    return {
+        "ok": True,
+        "subject": str(message["Subject"] or ""),
+        "to": str(message["To"] or ""),
+        "cc": str(message["Cc"] or ""),
+        "html": html_part.get_content() if html_part else "",
+    }
+
+
+@app.post("/manual/draft-email")
+def manual_draft_email(request: ManualDraftRequest) -> dict[str, object]:
+    articles = request.articles
+    if not articles:
+        return {"ok": False, "error": "No articles to draft."}
+
+    draft_date, date_text, file_label = _manual_draft_labels(articles, request.run_date)
+
+    draft_path = save_daily_email_draft(draft_date, articles, file_label=file_label, date_label=date_text)
+
+    webmail_saved = False
+    webmail_error = None
+    settings = get_settings()
+    if imap_credentials_ready(settings.email_credentials_file):
+        try:
+            webmail_saved = save_imap_draft(
+                build_daily_email_message(draft_date, articles, date_label=date_text),
+                settings.email_credentials_file,
+            )
+        except Exception as exc:
+            webmail_error = str(exc)
+
+    message = f"Built a manual draft from {len(articles)} uploaded article(s) across {date_text}."
+    if draft_path:
+        message = f"{message} Local draft: {draft_path}"
+    if webmail_saved:
+        message = f"{message} Hostinger draft saved."
+    elif webmail_error:
+        message = f"{message} Hostinger draft failed: {webmail_error}"
+
+    record_manual_history(
+        run_date=draft_date,
+        sources=sorted({a.site_remark for a in articles}),
+        articles=articles,
+        upload_drive=True,
+        save_webmail_draft=True,
+        send_email=False,
+        status="issues" if webmail_error else "completed",
+        message=message,
+        draft_path=draft_path,
+        webmail_draft_saved=webmail_saved,
+        webmail_draft_error=webmail_error,
+    )
+
+    return {
+        "ok": True,
+        "count": len(articles),
+        "draft_path": str(draft_path) if draft_path else None,
+        "webmail_draft_saved": webmail_saved,
+        "webmail_draft_error": webmail_error,
+        "message": message,
+    }

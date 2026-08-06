@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual Upload - Regulatory Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,600;6..72,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/history.css">
+<style>
+  .drop-zone{
+    position:relative; border:1.5px dashed var(--line); border-radius:var(--radius);
+    padding:44px 24px; text-align:center; cursor:pointer; color:var(--muted);
+    background:linear-gradient(180deg, rgba(184,132,46,0.03), rgba(184,132,46,0));
+    transition:border-color .18s, background .18s, box-shadow .18s, transform .12s;
+  }
+  .drop-zone:hover{
+    border-color:var(--brass); border-style:solid; background:var(--brass-soft);
+    box-shadow:0 2px 10px rgba(184,132,46,.12);
+  }
+  .drop-zone.drag-over{
+    border-color:var(--brass); border-style:solid; background:var(--brass-soft);
+    box-shadow:0 2px 14px rgba(184,132,46,.2); transform:scale(0.995);
+  }
+  .drop-zone:focus-visible{ outline:2px solid var(--brass); outline-offset:3px; }
+  .drop-zone-icon{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:44px; height:44px; border-radius:50%; margin-bottom:14px;
+    background:var(--brass-soft); transition:background .18s, transform .18s;
+  }
+  .drop-zone:hover .drop-zone-icon, .drop-zone.drag-over .drop-zone-icon{ transform:translateY(-2px); }
+  .drop-zone svg{ width:20px; height:20px; color:var(--brass-dark); }
+  .drop-zone-label{ font-weight:600; font-size:14.5px; color:var(--ink); }
+  .drop-hint{ color:var(--muted); font-size:12.5px; margin-top:5px; }
+  .drop-zone-tag{
+    display:inline-flex; align-items:center; gap:5px; margin-top:14px;
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px; font-weight:600;
+    letter-spacing:.04em; color:var(--brass-dark); background:var(--brass-soft);
+    padding:3px 9px; border-radius:20px;
+  }
+
+  .step-block{ padding-top:26px; }
+  .step-block:first-child{ padding-top:0; }
+  .step-title{ display:flex; align-items:center; gap:10px; font-size:14px; font-weight:600; color:var(--ink); margin:0 0 14px; }
+  .step-num{
+    display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:22px; height:22px; border-radius:50%; background:var(--brass-soft); color:var(--brass-dark);
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700;
+  }
+  .queue-count{
+    background:var(--seal-soft); color:var(--seal); font-family:'IBM Plex Mono', monospace;
+    font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; margin-left:auto;
+  }
+  .queue-empty{
+    border:1px dashed var(--line); border-radius:var(--radius); padding:22px; text-align:center;
+    color:var(--muted); font-size:13px;
+  }
+
+  .upload-list{ display:flex; flex-direction:column; gap:12px; }
+  .upload-card{ border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; background:var(--surface); box-shadow:var(--shadow-sm); }
+  .upload-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .upload-card-name{ font-weight:600; font-size:13.5px; word-break:break-all; color:var(--ink); }
+  .upload-card-row{ display:flex; gap:14px; margin-top:10px; flex-wrap:wrap; }
+  .upload-card-row > div{ display:flex; flex-direction:column; }
+  .upload-card-row label{ font-size:11.5px; color:var(--muted); margin-bottom:4px; }
+  .upload-card input[type=date], .upload-card input[type=text]{
+    padding:6px 9px; border:1px solid var(--line); border-radius:6px; font-size:13px; font-family:inherit; color:var(--ink);
+  }
+  .upload-card textarea{
+    width:100%; min-height:76px; margin-top:10px; border:1px solid var(--line); border-radius:6px;
+    padding:9px; font-size:13px; font-family:inherit; resize:vertical; color:var(--ink);
+  }
+  .upload-status{ font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:999px; background:#eef0f4; color:var(--muted); white-space:nowrap; }
+  .upload-status.processing{ background:var(--brass-soft); color:var(--brass-dark); }
+  .upload-status.done{ background:var(--ok-soft); color:var(--ok); }
+  .upload-status.error{ background:var(--seal-soft); color:var(--seal); }
+  .remove-btn{ border:none; background:none; color:var(--seal); cursor:pointer; font-size:12px; padding:0; font-weight:600; }
+  .drive-link{ display:inline-block; margin-top:8px; font-size:12.5px; color:var(--brass-dark); font-weight:600; }
+  .error-note{ color:var(--seal); font-size:12.5px; margin-top:8px; }
+
+  .panel-actions{ display:flex; gap:10px; margin-top:16px; }
+  .action-btn{
+    display:flex; align-items:center; gap:8px; justify-content:center;
+    font-family:'IBM Plex Sans', sans-serif; font-size:13px; font-weight:600;
+    padding:10px 18px; border-radius:8px; cursor:pointer; transition:filter .15s, background .15s, border-color .15s;
+  }
+  .action-btn svg{ width:15px; height:15px; flex-shrink:0; }
+  .action-btn-secondary{
+    background:var(--surface); border:1px solid var(--line); color:var(--brass-dark); box-shadow:var(--shadow-sm);
+  }
+  .action-btn-secondary:hover:not(:disabled){ border-color:var(--brass); background:var(--brass-soft); }
+  .action-btn-primary{
+    background:linear-gradient(155deg,#D4A146,var(--brass-dark)); border:1px solid transparent; color:#20140A;
+    box-shadow:0 4px 12px rgba(184,132,46,.3);
+  }
+  .action-btn-primary:hover:not(:disabled){ filter:brightness(1.06); }
+  .action-btn:disabled{ opacity:.45; cursor:not-allowed; box-shadow:none; }
+  .action-btn[hidden]{ display:none; }
+
+  .custom-select{ position:relative; }
+  .cs-trigger{
+    width:100%; display:flex; align-items:center; gap:9px;
+    font-family:'IBM Plex Sans', sans-serif; font-size:13px;
+    padding:9px 11px; border:1px solid var(--sidebar-line); border-radius:7px;
+    background:rgba(255,255,255,0.05); color:#EDEFF5; cursor:pointer;
+    transition:border-color .12s, background .12s;
+  }
+  .cs-trigger:hover{ background:rgba(255,255,255,0.08); }
+  .cs-trigger[aria-expanded="true"]{ border-color:var(--brass); }
+  .cs-trigger span{ flex:1; text-align:left; letter-spacing:0.02em; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cs-chevron{ width:14px; height:14px; color:var(--sidebar-text-dim); transition:transform .15s; flex-shrink:0; }
+  .cs-trigger[aria-expanded="true"] .cs-chevron{ transform:rotate(180deg); }
+  .cs-pop{
+    position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:40;
+    max-height:260px; overflow-y:auto;
+    background:#1A2036; border:1px solid rgba(255,255,255,0.11); border-radius:11px;
+    box-shadow:0 16px 40px rgba(0,0,0,0.5); padding:6px;
+  }
+  .cs-pop[hidden]{ display:none; }
+  .cs-option{
+    padding:8px 10px; border-radius:7px; font-size:12.5px; color:var(--sidebar-text);
+    cursor:pointer; transition:background .12s;
+  }
+  .cs-option:hover{ background:rgba(255,255,255,.09); }
+  .cs-option.selected{
+    background:linear-gradient(155deg,#D4A146,var(--brass-dark)); color:#20140A; font-weight:600;
+  }
+
+  .email-preview{ margin-top:18px; border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; }
+  .email-preview-head{
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    background:var(--brass-soft); border-bottom:1px solid var(--line);
+  }
+  .email-preview-label{
+    font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--brass-dark);
+    flex-shrink:0;
+  }
+  .email-preview-subject{
+    font-size:12.5px; color:var(--ink); font-weight:600;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .email-preview-frame{ width:100%; height:560px; border:none; background:#fff; display:block; }
+
+  @media (max-width:900px){
+    .shell.sidebar-collapsed .sidebar{ display:none; }
+  }
+
+  /* This page's .panel has no built-in padding (other pages add their own
+     via child elements), so give it one here. */
+  .panel{ padding:24px; }
+
+  /* Fill the dead space at the bottom of the sidebar with quick reference
+     info, pinned via margin-top:auto like .side-actions elsewhere. */
+  .side-footer{ margin-top:auto; padding-top:16px; }
+  .side-tip-list{ display:flex; flex-direction:column; gap:11px; margin-bottom:18px; }
+  .side-tip{ display:flex; gap:9px; align-items:flex-start; }
+  .side-tip svg{ width:14px; height:14px; color:var(--brass); flex-shrink:0; margin-top:1px; }
+  .side-tip span{ font-size:12px; line-height:1.5; color:var(--sidebar-text-dim); }
+  .side-footer-note{
+    font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--sidebar-text-dim);
+    padding-top:14px; border-top:1px solid var(--sidebar-line); letter-spacing:.03em;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="seal-mark">
+        <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#1D2338"/>
+              <stop offset="1" stop-color="#121625"/>
+            </linearGradient>
+            <linearGradient id="brassGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#E0B563"/>
+              <stop offset="0.55" stop-color="#B8842E"/>
+              <stop offset="1" stop-color="#8F6620"/>
+            </linearGradient>
+            <linearGradient id="brassRing" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#F0CE8C"/>
+              <stop offset="1" stop-color="#B8842E"/>
+            </linearGradient>
+          </defs>
+          <rect width="128" height="128" rx="26" fill="url(#bgGrad)"/>
+          <g transform="translate(64,60)">
+            <circle r="38" fill="none" stroke="url(#brassRing)" stroke-width="2.5" opacity="0.55"/>
+            <circle r="29" fill="url(#brassGrad)"/>
+            <g>
+              <rect x="-14" y="-19" width="28" height="34" rx="3" fill="#1B1204" opacity="0.92"/>
+              <rect x="-9" y="-11" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+              <rect x="-9" y="-4" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+              <rect x="-9" y="3" width="18" height="3" rx="1.5" fill="url(#brassGrad)"/>
+              <rect x="-9" y="10" width="11" height="3" rx="1.5" fill="url(#brassGrad)"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Regulatory Monitor</h1>
+        <p>Manual upload</p>
+      </div>
+    </div>
+
+    <p class="side-section-label">About this tool</p>
+    <div class="field">
+      <p style="font-size:13px; color:#8a8f9c; line-height:1.5;">
+        For sources the automated scraper can't reach (blocked, JS-locked, etc.).
+        Download the PDF yourself, drop it below with its published date, generate a
+        summary, then draft the combined email &mdash; same pipeline as the automated sources
+        (Drive upload, AI summary, email draft).
+      </p>
+    </div>
+    <div class="field">
+      <label>Source</label>
+      <div class="custom-select" id="sourceSelect">
+        <button type="button" class="cs-trigger" id="csTrigger" aria-haspopup="listbox" aria-expanded="false">
+          <span id="csLabel">GOI income tax website</span>
+          <svg class="cs-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="cs-pop" id="csPop" role="listbox" hidden></div>
+      </div>
+    </div>
+
+    <div class="side-footer">
+      <p class="side-section-label">Good to know</p>
+      <div class="side-tip-list">
+        <div class="side-tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span>Only PDF files are accepted &mdash; other formats are ignored on drop.</span>
+        </div>
+        <div class="side-tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span>Uploads sync to the same Drive folder as automated sources.</span>
+        </div>
+        <div class="side-tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <span>Summaries are editable before you draft the combined email.</span>
+        </div>
+      </div>
+      <div class="side-footer-note">MANUAL PIPELINE &middot; v1</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn sidebar-toggle" id="sidebarToggle" type="button" title="Toggle sidebar" aria-label="Toggle sidebar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
+        <div>
+          <h2>Manual Upload</h2>
+          <div class="sub">Drop PDFs, generate summaries, draft the email.</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <a class="history-btn" href="/">Dashboard</a>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="step-block">
+        <div class="step-title"><span class="step-num">1</span> Add PDFs</div>
+        <div class="drop-zone" id="dropZone" tabindex="0">
+          <div class="drop-zone-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 16V4M12 4l-4 4M12 4l4 4"/>
+              <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+            </svg>
+          </div>
+          <div class="drop-zone-label">Drag &amp; drop PDF files here, or click to browse</div>
+          <div class="drop-hint">Each file gets its own date &mdash; edit it before generating the summary.</div>
+          <span class="drop-zone-tag">PDF ONLY</span>
+          <input type="file" id="fileInput" accept="application/pdf" multiple hidden>
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-title">
+          <span class="step-num">2</span> Review &amp; generate summaries
+          <span class="queue-count" id="queueCount" hidden>0</span>
+        </div>
+        <div class="queue-empty" id="queueEmpty">No files added yet &mdash; drop a PDF above to get started.</div>
+        <div class="upload-list" id="uploadList"></div>
+        <div class="panel-actions">
+          <button type="button" class="action-btn action-btn-secondary" id="generateBtn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            Generate Summaries
+          </button>
+        </div>
+      </div>
+
+      <div class="step-block">
+        <div class="step-title"><span class="step-num">3</span> Draft the email</div>
+        <div class="panel-actions">
+          <button type="button" class="action-btn action-btn-primary" id="draftBtn" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 6l8 6 8-6"/></svg>
+            Draft the Mail
+          </button>
+          <button type="button" class="action-btn action-btn-secondary" id="openWebmailBtn" disabled title="Available once a draft has been saved to Hostinger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>
+            Open in Webmail
+          </button>
+        </div>
+        <div class="footer-note" id="statusNote"></div>
+        <div class="email-preview" id="emailPreview" hidden>
+          <div class="email-preview-head">
+            <span class="email-preview-label">Preview</span>
+            <span class="email-preview-subject" id="previewSubject"></span>
+          </div>
+          <iframe class="email-preview-frame" id="previewFrame" title="Email preview" sandbox=""></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const uploadList = document.getElementById('uploadList');
+const queueEmpty = document.getElementById('queueEmpty');
+const queueCount = document.getElementById('queueCount');
+const generateBtn = document.getElementById('generateBtn');
+const draftBtn = document.getElementById('draftBtn');
+const openWebmailBtn = document.getElementById('openWebmailBtn');
+const statusNote = document.getElementById('statusNote');
+const emailPreview = document.getElementById('emailPreview');
+const previewSubject = document.getElementById('previewSubject');
+const previewFrame = document.getElementById('previewFrame');
+const csTrigger = document.getElementById('csTrigger');
+const csPop = document.getElementById('csPop');
+const csLabel = document.getElementById('csLabel');
+
+let items = [];
+let nextId = 1;
+
+const PREFERRED_REMARK = 'GOI income tax website';
+let siteOptions = [PREFERRED_REMARK];
+let selectedRemark = PREFERRED_REMARK;
+
+function csRenderOptions(){
+  csPop.innerHTML = siteOptions.map(remark => `
+    <div class="cs-option ${remark === selectedRemark ? 'selected' : ''}" data-remark="${escapeHtml(remark)}" role="option">
+      ${escapeHtml(remark)}
+    </div>
+  `).join('');
+}
+
+function csOpen(){ csPop.hidden = false; csTrigger.setAttribute('aria-expanded', 'true'); }
+function csClose(){ csPop.hidden = true; csTrigger.setAttribute('aria-expanded', 'false'); }
+
+csTrigger.addEventListener('click', (e) => {
+  e.stopPropagation();
+  csPop.hidden ? csOpen() : csClose();
+});
+csPop.addEventListener('click', (e) => {
+  const option = e.target.closest('.cs-option');
+  if(!option) return;
+  selectedRemark = option.dataset.remark;
+  csLabel.textContent = selectedRemark;
+  csRenderOptions();
+  csClose();
+});
+document.addEventListener('click', () => { if(!csPop.hidden) csClose(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape' && !csPop.hidden) csClose(); });
+
+async function loadSiteOptions(){
+  try{
+    const res = await fetch('/sites');
+    if(!res.ok) return;
+    const sites = await res.json();
+    const remarks = [...new Set(sites.map(s => s.remark).filter(Boolean))];
+    if(!remarks.length) return;
+    if(!remarks.includes(PREFERRED_REMARK)) remarks.unshift(PREFERRED_REMARK);
+    siteOptions = remarks;
+    selectedRemark = PREFERRED_REMARK;
+    csLabel.textContent = selectedRemark;
+    csRenderOptions();
+  }catch(e){ /* keep the static fallback option */ }
+}
+csRenderOptions();
+loadSiteOptions();
+
+function todayIso(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function escapeHtml(value){
+  return String(value ?? '')
+    .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+}
+
+function addFiles(fileList){
+  for(const file of fileList){
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if(!isPdf) continue;
+    items.push({
+      id: nextId++,
+      file,
+      dateValue: todayIso(),
+      titleValue: '',
+      status: 'pending',
+      article: null,
+      error: null,
+    });
+  }
+  render();
+}
+
+function removeItem(id){
+  items = items.filter(item => item.id !== id);
+  render();
+}
+
+function render(){
+  uploadList.innerHTML = items.map(item => `
+    <div class="upload-card" data-id="${item.id}">
+      <div class="upload-card-head">
+        <span class="upload-card-name">${escapeHtml(item.file.name)}</span>
+        <span class="upload-status ${item.status}">${item.status}</span>
+        <button type="button" class="remove-btn" data-remove="${item.id}">Remove</button>
+      </div>
+      <div class="upload-card-row">
+        <div>
+          <label>Published date</label>
+          <input type="date" data-date="${item.id}" value="${item.dateValue}">
+        </div>
+        <div style="flex:1; min-width:220px;">
+          <label>Title (optional &mdash; auto-detected if left blank)</label>
+          <input type="text" data-title="${item.id}" value="${escapeHtml(item.titleValue)}" placeholder="Leave blank to auto-detect from the PDF">
+        </div>
+      </div>
+      ${item.article ? `
+        <textarea data-summary="${item.id}">${escapeHtml(item.article.summary || '')}</textarea>
+        ${item.article.drive_pdf_url ? `<a class="drive-link" href="${escapeHtml(item.article.drive_pdf_url)}" target="_blank" rel="noreferrer">View in Drive</a>` : ''}
+      ` : ''}
+      ${item.error ? `<div class="error-note">${escapeHtml(item.error)}</div>` : ''}
+    </div>
+  `).join('');
+
+  uploadList.querySelectorAll('[data-date]').forEach(input => {
+    input.addEventListener('change', () => {
+      const item = items.find(i => i.id === Number(input.dataset.date));
+      if(item) item.dateValue = input.value;
+    });
+  });
+  uploadList.querySelectorAll('[data-title]').forEach(input => {
+    input.addEventListener('input', () => {
+      const item = items.find(i => i.id === Number(input.dataset.title));
+      if(item) item.titleValue = input.value;
+    });
+  });
+  uploadList.querySelectorAll('[data-summary]').forEach(textarea => {
+    textarea.addEventListener('input', () => {
+      const item = items.find(i => i.id === Number(textarea.dataset.summary));
+      if(item && item.article) item.article.summary = textarea.value;
+    });
+    textarea.addEventListener('change', () => updatePreview());
+  });
+  uploadList.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.addEventListener('click', () => removeItem(Number(btn.dataset.remove)));
+  });
+
+  generateBtn.disabled = !items.some(i => i.status === 'pending' || i.status === 'error');
+  draftBtn.disabled = !items.some(i => i.status === 'done');
+  queueEmpty.hidden = items.length > 0;
+  if(items.length){
+    queueCount.hidden = false;
+    queueCount.textContent = String(items.length);
+  } else {
+    queueCount.hidden = true;
+  }
+}
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  addFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', () => { addFiles(fileInput.files); fileInput.value = ''; });
+
+async function updatePreview(){
+  const ready = items.filter(i => i.status === 'done' && i.article);
+  if(!ready.length){
+    emailPreview.hidden = true;
+    return;
+  }
+  try{
+    const res = await fetch('/manual/preview-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ articles: ready.map(i => i.article) }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || data.ok === false) throw new Error(data.error || ('request failed (' + res.status + ')'));
+    previewSubject.textContent = data.subject || '';
+    previewFrame.srcdoc = data.html || '';
+    emailPreview.hidden = false;
+  }catch(e){
+    emailPreview.hidden = true;
+  }
+}
+
+async function processItem(item){
+  item.status = 'processing';
+  item.error = null;
+  render();
+  try{
+    const formData = new FormData();
+    formData.append('file', item.file);
+    formData.append('published_date', item.dateValue);
+    formData.append('title', item.titleValue);
+    formData.append('site_remark', selectedRemark || PREFERRED_REMARK);
+    const res = await fetch('/manual/summarize', { method: 'POST', body: formData });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || data.ok === false) throw new Error(data.error || ('request failed (' + res.status + ')'));
+    item.article = data.article;
+    item.status = 'done';
+  }catch(e){
+    item.status = 'error';
+    item.error = e.message;
+  }
+  render();
+}
+
+generateBtn.addEventListener('click', async () => {
+  generateBtn.disabled = true;
+  statusNote.textContent = 'Generating summaries...';
+  const targets = items.filter(i => i.status === 'pending' || i.status === 'error');
+  for(const item of targets){
+    await processItem(item);
+  }
+  statusNote.textContent = 'Done generating summaries.';
+  await updatePreview();
+  render();
+});
+
+draftBtn.addEventListener('click', async () => {
+  const ready = items.filter(i => i.status === 'done' && i.article);
+  if(!ready.length) return;
+  draftBtn.disabled = true;
+  openWebmailBtn.disabled = true;
+  statusNote.textContent = 'Building the draft email...';
+  try{
+    const res = await fetch('/manual/draft-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ articles: ready.map(i => i.article) }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || data.ok === false) throw new Error(data.error || ('request failed (' + res.status + ')'));
+    statusNote.textContent = data.message || 'Draft built.';
+    openWebmailBtn.disabled = !data.webmail_draft_saved;
+    await updatePreview();
+  }catch(e){
+    statusNote.textContent = 'Draft failed: ' + e.message;
+  }
+  draftBtn.disabled = !items.some(i => i.status === 'done');
+  render();
+});
+
+openWebmailBtn.addEventListener('click', () => {
+  if(openWebmailBtn.disabled) return;
+  window.open('https://webmail.hostinger.com/', '_blank', 'noreferrer');
+});
+
+const shell = document.querySelector('.shell');
+const sidebarToggle = document.getElementById('sidebarToggle');
+function setSidebarHidden(hidden){
+  shell.classList.toggle('sidebar-collapsed', hidden);
+  sidebarToggle.setAttribute('aria-label', hidden ? 'Show sidebar' : 'Hide sidebar');
+  sidebarToggle.setAttribute('title', hidden ? 'Show sidebar' : 'Hide sidebar');
+}
+sidebarToggle.addEventListener('click', () => setSidebarHidden(!shell.classList.contains('sidebar-collapsed')));
+if(window.matchMedia('(max-width: 900px)').matches){
+  setSidebarHidden(true);
+}
+
+render();
+</script>
+</body>
+</html>

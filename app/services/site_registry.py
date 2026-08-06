@@ -74,6 +74,16 @@ DEFAULT_SITES: list[SiteConfig] = [
         remark="SEBI website (Gazette Notifications)",
         url="https://www.sebi.gov.in/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=82&smid=0",
     ),
+    SiteConfig(
+        name="Income Tax India Circulars",
+        remark="GOI income tax website",
+        url="https://www.incometaxindia.gov.in/Pages/communications/circulars.aspx",
+    ),
+    SiteConfig(
+        name="Income Tax India Notifications",
+        remark="GOI income tax website",
+        url="https://www.incometaxindia.gov.in/Pages/communications/notifications.aspx",
+    ),
 ]
 
 

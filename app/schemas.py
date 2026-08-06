@@ -26,6 +26,11 @@ class ArticleResult(BaseModel):
     summary: str | None = None
 
 
+class ManualDraftRequest(BaseModel):
+    articles: list[ArticleResult]
+    run_date: date | None = None
+
+
 class DailyRunResponse(BaseModel):
     run_date: date
     articles_found: int
