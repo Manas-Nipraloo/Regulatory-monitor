@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     supabase_url: str = ""
     supabase_key: str = ""
     pending_lookback_days: int = 3
+    pending_display_window_days: int = 6
 
 
 @lru_cache

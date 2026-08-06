@@ -1,5 +1,5 @@
 """Shared queue of discovered-but-unreviewed articles, stored in Supabase."""
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 
 from app.schemas import PendingArticle
 from app.services import supabase_client
@@ -23,7 +23,16 @@ def add_pending(items: list[PendingArticle]) -> int:
     return len(inserted or [])
 
 
-def list_pending(status: str = "pending", limit: int = 200) -> list[PendingArticle]:
+def list_pending(
+    status: str = "pending", limit: int = 200, max_age_days: int | None = None
+) -> list[PendingArticle]:
+    """List pending items, most recently discovered first.
+
+    `max_age_days`, when set, drops items whose article date (published_date,
+    falling back to run_date for undated new-arrivals) is older than that many
+    days — this keeps one-time baseline-seed noise out of the review list
+    without deleting it from Supabase.
+    """
     params = {
         "select": "*",
         "order": "discovered_at.desc",
@@ -38,6 +47,11 @@ def list_pending(status: str = "pending", limit: int = 200) -> list[PendingArtic
             items.append(PendingArticle.model_validate(row))
         except ValueError:
             continue
+    if max_age_days is not None:
+        cutoff = date.today() - timedelta(days=max_age_days)
+        items = [
+            item for item in items if (item.published_date or item.run_date) >= cutoff
+        ]
     return items
 
 

@@ -297,7 +297,11 @@ def pending_list() -> list[dict[str, object]]:
         return []
 
     try:
-        return [item.model_dump(mode="json") for item in pending_store.list_pending()]
+        window = get_settings().pending_display_window_days
+        return [
+            item.model_dump(mode="json")
+            for item in pending_store.list_pending(max_age_days=window)
+        ]
     except Exception:
         return []
 
